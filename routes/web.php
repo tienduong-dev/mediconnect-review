@@ -79,8 +79,17 @@ Route::middleware(['isDoctor'])->group(function () {
 Route::middleware(['isPatient'])->group(function () {
     // ================ Patient Router's ================
     Route::get('Patient/MyProfile', [PatientController::class, 'patientProfile']);
-    Route::get('Patient/EditProfile/{id}', [PatientController::class, 'editPatientForm']);
-    Route::post('Patient/EditThisProfile', [PatientController::class, 'editPatient']);
+
+    Route::get('Patient/EditProfile', [
+        PatientController::class,
+        'editPatientForm'
+    ]);
+
+    Route::post('Patient/EditProfile', [
+        PatientController::class,
+        'editPatient'
+    ]);
+    
     Route::get('Patient/Delete/{id}', [PatientController::class, 'deletePatient']);
     Route::get('Patient/AppointmentHistory', [PatientController::class, 'getAppointmentHistory']);
     Route::post('Patient/Appointment/UpdateStatus', [PatientController::class, 'appointmentCancel']);

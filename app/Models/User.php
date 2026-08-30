@@ -50,10 +50,12 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'date_of_birth' => 'date',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
-
+    
     public function doctorDetails()
     {
         return $this->hasOne(Doctor::class, 'user_id');
