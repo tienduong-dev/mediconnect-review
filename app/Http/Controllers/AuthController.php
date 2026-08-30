@@ -32,18 +32,26 @@ class AuthController extends Controller
 
     public function registerProcess(Request $req)
     {
-        // $file = $req->image;
-        // $name = time().".".$file->getClientOriginalExtension();
-        // $file->move(public_path('upload'), $name); // move file on upload folder
-
-        User::create([
-            'name' => $req->name,
-            'email' => $req->email,
-            'number' => $req->number,
-            'password' => $req->password
+        $validated = $req->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:500',
+            'email' => 'required|email|max:255|unique:users,email',
+            'number' => 'required|string|max:20|unique:users,number',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        return redirect('/login');
+        User::create([
+            'name' => $validated['name'],
+            'address' => $validated['address'],
+            'email' => $validated['email'],
+            'number' => $validated['number'],
+            'password' => $validated['password'],
+            'user_type' => 'Patient',
+            'account_status' => 'Active',
+        ]);
+
+        return redirect('/login')
+            ->with('success', 'Registration successful. Please login.');
     }
 
     public function logoutProcess()
