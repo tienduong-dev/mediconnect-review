@@ -1,6 +1,13 @@
 @extends('layout')
 
 @section('main-content')
+    @if (auth()->check() && auth()->user()->user_type === 'Patient')
+        <div class="container mt-4">
+            <div class="alert alert-success">
+                Welcome, {{ auth()->user()->name }}!
+            </div>
+        </div>
+    @endif
     <!-- Helth Compassionate -->
     <section class="helth-compassionate cmn-bg my-5">
         <div class="container">
@@ -229,6 +236,135 @@
                     </a>
                 </div>
             </div>
+        </div>
+    </section>
+    <!-- Medical Contents Section -->
+    <section class="services-section main-style cmn-bg fix p-4">
+        <div class="container">
+
+            <div class="section-title mb-4">
+                <h3 class="black">
+                    Medical Knowledge
+                </h3>
+
+                <p class="pra">
+                    Latest health information from MediConnect
+                </p>
+            </div>
+
+            <div class="row g-4">
+
+                {{-- Diseases --}}
+                @foreach ($diseases as $content)
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item white-bg rounded-4 h-100">
+
+                            <span class="cmn-tag p1-bg heading-font mb-3">
+                                Disease
+                            </span>
+
+                            <h5 class="black mb-2">
+                                {{ $content->title }}
+                            </h5>
+
+                            <p class="pra">
+                                {{ $content->summary }}
+                            </p>
+
+                        </div>
+                    </div>
+                @endforeach
+
+
+                {{-- Preventions --}}
+                @foreach ($preventions as $content)
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item white-bg rounded-4 h-100">
+
+                            <span class="cmn-tag p1-bg heading-font mb-3">
+                                Prevention
+                            </span>
+
+                            <h5 class="black mb-2">
+                                {{ $content->title }}
+                            </h5>
+
+                            <p class="pra">
+                                {{ $content->summary }}
+                            </p>
+
+                        </div>
+                    </div>
+                @endforeach
+
+
+                {{-- Cures --}}
+                @foreach ($cures as $content)
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item white-bg rounded-4 h-100">
+
+                            <span class="cmn-tag p1-bg heading-font mb-3">
+                                Cure
+                            </span>
+
+                            <h5 class="black mb-2">
+                                {{ $content->title }}
+                            </h5>
+
+                            <p class="pra">
+                                {{ $content->summary }}
+                            </p>
+
+                        </div>
+                    </div>
+                @endforeach
+
+
+                {{-- Medical News --}}
+                @foreach ($medicalNews as $content)
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item white-bg rounded-4 h-100">
+
+                            <span class="cmn-tag p1-bg heading-font mb-3">
+                                Medical News
+                            </span>
+
+                            <h5 class="black mb-2">
+                                {{ $content->title }}
+                            </h5>
+
+                            <p class="pra">
+                                {{ $content->summary }}
+                            </p>
+
+                        </div>
+                    </div>
+                @endforeach
+
+
+                {{-- Medical Inventions --}}
+                @foreach ($medicalInventions as $content)
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item white-bg rounded-4 h-100">
+
+                            <span class="cmn-tag p1-bg heading-font mb-3">
+                                Medical Invention
+                            </span>
+
+                            <h5 class="black mb-2">
+                                {{ $content->title }}
+                            </h5>
+
+                            <p class="pra">
+                                {{ $content->summary }}
+                            </p>
+
+                        </div>
+                    </div>
+                @endforeach
+
+            </div>
+
         </div>
     </section>
 

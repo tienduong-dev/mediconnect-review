@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\LocalController;
@@ -96,12 +97,10 @@ Route::post('BookAppointmentNow', [LocalController::class, 'saveAppointment']);
 
 
 
-Route::get('/', function () {
-    return view('index');
-});
-Route::get('/index', function () {
-    return view('index');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/index', [HomeController::class, 'index']);
+
 Route::get('/index2', function () {
     return view('index2');
 });
