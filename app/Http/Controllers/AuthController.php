@@ -8,26 +8,48 @@ use Auth;
 
 class AuthController extends Controller
 {
-    public function loginProcess(Request $req)
+   public function loginProcess(Request $req)
     {
-        $req->validate([
+        $validated = $req->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
-        if (Auth::attempt(['email' => $req->email, 'password' => $req->password])) {
-            if (Auth::user()->user_type == 'Admin') {
+        if (Auth::attempt([
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+            'account_status' => 'Active',
+        ])) {
+
+            $req->session()->regenerate();
+
+            $user = Auth::user();
+
+            // Lưu thời gian đăng nhập gần nhất
+            $user->last_login_at = now();
+            $user->save();
+
+            if ($user->user_type === 'Admin') {
                 return redirect('/Admin/AdminDashboard');
             }
-            if (Auth::user()->user_type == 'Patient') {
-                return redirect('/Patient/PatientDashboard');
-            }
-            if (Auth::user()->user_type == 'Doctor') {
+
+            if ($user->user_type === 'Doctor') {
                 return redirect('/Doctor/DoctorDashboard');
             }
-        } else {
-            return redirect('login')->with("loginFail", "username and password are wrong");
+
+            if ($user->user_type === 'Patient') {
+                return redirect('/Patient/PatientDashboard');
+            }
+
+            Auth::logout();
+
+            return redirect('/login')
+                ->with('loginFail', 'Invalid user account.');
         }
+
+        return back()
+            ->withInput($req->only('email'))
+            ->with('loginFail', 'Email or password is incorrect.');
     }
 
     public function registerProcess(Request $req)

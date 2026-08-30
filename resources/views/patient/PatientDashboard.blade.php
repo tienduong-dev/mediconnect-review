@@ -1,6 +1,19 @@
 @extends('patient.PatientLayout')
 
 @section('patient-content')
+
+    <div class="container mt-4">
+        <div class="alert alert-success">
+            <h4 class="mb-1">
+                Welcome, {{ $user->name }}!
+            </h4>
+
+            <p class="mb-0">
+                Welcome back to MediConnect.
+            </p>
+        </div>
+    </div>
+    
     @if (session('done'))
         <div class="container m-4">
             <h4 id="remove-msg" style="color: green;">{{ session('done') }}</h4>

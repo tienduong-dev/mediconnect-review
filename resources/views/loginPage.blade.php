@@ -41,7 +41,12 @@
                             @csrf
                             <div class="row g-lg-3 g-3">
                                 <div class="col-lg-12">
-                                    <input type="email" name="email" id="email" placeholder="Your Email" required>
+                                    <input type="email"
+                                        name="email"
+                                        id="email"
+                                        value="{{ old('email') }}"
+                                        placeholder="Your Email"
+                                        required>
                                 </div>
                                 <div class="col-lg-12">
                                     <input type="password" name="password" id="password" placeholder="Your Password"

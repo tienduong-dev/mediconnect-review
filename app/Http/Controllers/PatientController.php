@@ -11,11 +11,11 @@ class PatientController extends Controller
 {
     public function dashboard()
     {
-        $user = Auth::user(); // logged-in user 
+        $user = Auth::user();
 
-        // return view('patient.PatientDashboard', compact('user'));
-        return view('patient.PatientDashboard');
+        return view('patient.PatientDashboard', compact('user'));
     }
+    
     public function getAppointmentHistory()
     {
         $user = Auth::user(); // logged-in user 
