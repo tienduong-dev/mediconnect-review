@@ -325,6 +325,20 @@ window.addEventListener('load', function () {
                                 <strong>Education:</strong>
                                 ${doctor.education}
                             </p>
+                            
+                            <div class="mt-4">
+                                <a
+                                    href="/doctors/${doctor.assignment_id}"
+                                    class="common-btn box-style p2-bg
+                                        d-inline-flex justify-content-center
+                                        align-items-center gap-2
+                                        fs16 fw-semibold white
+                                        overflow-hidden rounded100"
+                                    style="padding: 10px 18px;"
+                                >
+                                    View Details
+                                </a>
+                            </div>
 
                         </div>
 

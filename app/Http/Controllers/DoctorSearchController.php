@@ -137,4 +137,26 @@ class DoctorSearchController extends Controller
 
         return response()->json($doctors);
     }
+    // Show selected doctor details
+    public function show($assignmentId)
+    {
+        $assignment = DoctorAssignment::with([
+            'doctor.user',
+            'facilitySpecialization.facility.city',
+            'facilitySpecialization.specialization',
+        ])
+        ->where('status', 'Active')
+        ->whereHas('doctor', function ($query) {
+            $query->where('status', 'Active');
+        })
+        ->whereHas('facilitySpecialization', function ($query) {
+            $query->where('status', 'Active');
+        })
+        ->findOrFail($assignmentId);
+
+        return view(
+            'patient.PatientDoctorDetail',
+            compact('assignment')
+        );
+    }
 }

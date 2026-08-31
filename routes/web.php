@@ -114,6 +114,11 @@ Route::middleware(['isPatient'])->group(function () {
         '/doctors/results',
         [DoctorSearchController::class, 'getDoctors']
     );
+
+    Route::get(
+        '/doctors/{assignmentId}',
+        [DoctorSearchController::class, 'show']
+    )->name('patient.doctor.show');
 });
 
 // views routers 
