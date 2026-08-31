@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\DoctorSearchController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\LocalController;
 use App\Http\Controllers\PatientController;
@@ -93,10 +94,29 @@ Route::middleware(['isPatient'])->group(function () {
     Route::get('Patient/Delete/{id}', [PatientController::class, 'deletePatient']);
     Route::get('Patient/AppointmentHistory', [PatientController::class, 'getAppointmentHistory']);
     Route::post('Patient/Appointment/UpdateStatus', [PatientController::class, 'appointmentCancel']);
+    // Doctor Search
+    Route::get(
+        '/doctors',
+        [DoctorSearchController::class, 'index']
+    );
+
+    Route::get(
+        '/doctors/facilities/{cityId}',
+        [DoctorSearchController::class, 'getFacilities']
+    );
+
+    Route::get(
+        '/doctors/specializations/{facilityId}',
+        [DoctorSearchController::class, 'getSpecializations']
+    );
+
+    Route::get(
+        '/doctors/results',
+        [DoctorSearchController::class, 'getDoctors']
+    );
 });
 
 // views routers 
-Route::get('/doctors', [LocalController::class, 'getDoctorsList']);
 Route::get('/doctorDetails/{id}', [LocalController::class, 'getThisDoctorDetails']);
 
 Route::get('FilterDoctors', [LocalController::class, 'getDoctorListForFilter']);
