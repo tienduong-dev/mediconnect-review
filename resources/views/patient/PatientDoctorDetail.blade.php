@@ -512,16 +512,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // =========================
     // DATE CHANGE
     // =========================
-    dateSelect.addEventListener(
+    $('#appointment_date').on(
         'change',
         async function () {
 
-            const selectedDate = this.value;
+            const selectedDate = $(this).val();
 
             selectedSlotInput.value = '';
-
             continueButton.disabled = true;
-
 
             if (!selectedDate) {
 
@@ -534,13 +532,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-
             slotsContainer.innerHTML = `
                 <span class="text-muted">
                     Loading available slots...
                 </span>
             `;
-
 
             try {
 
@@ -548,8 +544,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     `/doctors/${assignmentId}/slots?date=${selectedDate}`
                 );
 
-                const slots = await response.json();
+                if (!response.ok) {
+                    throw new Error('Unable to load slots');
+                }
 
+                const slots = await response.json();
 
                 if (slots.length === 0) {
 
@@ -562,9 +561,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
-
                 slotsContainer.innerHTML = '';
-
 
                 slots.forEach(function (slot) {
 
@@ -574,62 +571,55 @@ document.addEventListener('DOMContentLoaded', function () {
                     button.type = 'button';
 
                     button.className =
-                        'btn btn-outline-success slot-button';
+                        'appointment-slot-btn';
 
-                    button.dataset.slotId = slot.id;
+                    button.dataset.slotId =
+                        slot.id;
 
                     button.textContent =
                         `${slot.start_time} - ${slot.end_time}`;
-
 
                     button.addEventListener(
                         'click',
                         function () {
 
                             document
-                                .querySelectorAll('.slot-button')
+                                .querySelectorAll(
+                                    '.appointment-slot-btn'
+                                )
                                 .forEach(function (item) {
 
                                     item.classList.remove(
-                                        'btn-success',
-                                        'text-white'
-                                    );
-
-                                    item.classList.add(
-                                        'btn-outline-success'
+                                        'selected'
                                     );
                                 });
 
-
-                            this.classList.remove(
-                                'btn-outline-success'
-                            );
-
                             this.classList.add(
-                                'btn-success',
-                                'text-white'
+                                'selected'
                             );
-
 
                             selectedSlotInput.value =
                                 this.dataset.slotId;
 
-                            continueButton.disabled = false;
+                            continueButton.disabled =
+                                false;
                         }
                     );
 
-
-                    slotsContainer.appendChild(button);
+                    slotsContainer.appendChild(
+                        button
+                    );
                 });
 
             } catch (error) {
+
+                console.error(error);
 
                 slotsContainer.innerHTML = `
                     <div class="alert alert-danger w-100 mb-0">
                         Unable to load appointment slots.
                     </div>
                 `;
-
             }
         }
     );
