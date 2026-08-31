@@ -114,6 +114,7 @@
                                         <li><a href="{{ url('Patient/PatientDashboard') }}">Home</a></li>
                                         <li><a href="{{ url('about') }}">About Us</a></li>
                                         <li><a href="{{ url('doctors') }}">Doctor</a></li>
+                                        <li><a href="{{ route('patient.appointments') }}">My Appointments</a></li>
                                         <li><a href="{{ url('contact') }}">Contact</a></li>
                                         @if (auth()->user())
                                             <li class="has-dropdown"><a href="{{ url('logout') }}"

@@ -22,37 +22,39 @@ class PatientController extends Controller
 
     // Appointment History
  
-    public function getAppointmentHistory()
+    // Show list of appointments of current patient
+    public function myAppointments()
     {
-        $user = Auth::user();
-
-        $user_with_apt = User::with('appointments.doctor.user')
-            ->find($user->id);
-
-        $appointments = [];
-        $i = 0;
-
-        foreach ($user_with_apt->appointments as $apt) {
-
-            if ($apt->status == 'Cancel') {
-                continue;
-            }
-
-            $appointments[$i]['id'] = $apt->id;
-            $appointments[$i]['name'] = $apt->name;
-            $appointments[$i]['number'] = $apt->number;
-            $appointments[$i]['doctor_name'] = $apt->doctor->user->name;
-            $appointments[$i]['day'] = $apt->day;
-            $appointments[$i]['date'] = $apt->date;
-            $appointments[$i]['time'] = $apt->time;
-            $appointments[$i]['status'] = $apt->status;
-
-            $i++;
-        }
+        $appointments = Appointments::with([
+            'doctorAssignment.doctor.user',
+            'doctorAssignment.facilitySpecialization.facility',
+            'doctorAssignment.facilitySpecialization.specialization',
+        ])
+        ->where('patient_user_id', Auth::id())
+        ->orderByDesc('appointment_date')
+        ->orderByDesc('start_time')
+        ->get();
 
         return view(
-            'patient.PatientAppointmentHistory',
+            'patient.PatientMyAppointments',
             compact('appointments')
+        );
+    }
+    // Show one (detail)appointment of current patient
+    public function appointmentDetail($id)
+    {
+        $appointment = Appointments::with([
+            'doctorAssignment.doctor.user',
+            'doctorAssignment.facilitySpecialization.facility.city',
+            'doctorAssignment.facilitySpecialization.specialization',
+            'slot',
+        ])
+        ->where('patient_user_id', Auth::id())
+        ->findOrFail($id);
+
+        return view(
+            'patient.PatientAppointmentDetail',
+            compact('appointment')
         );
     }
 
@@ -189,4 +191,5 @@ class PatientController extends Controller
 
         return redirect('index');
     }
+
 }

@@ -93,7 +93,18 @@ Route::middleware(['isPatient'])->group(function () {
     ]);
     
     Route::get('Patient/Delete/{id}', [PatientController::class, 'deletePatient']);
-    Route::get('Patient/AppointmentHistory', [PatientController::class, 'getAppointmentHistory']);
+    // My Appointments
+    Route::get(
+        '/Patient/MyAppointments',
+        [PatientController::class, 'myAppointments']
+    )->name('patient.appointments');
+
+
+    Route::get(
+        '/Patient/Appointments/{id}',
+        [PatientController::class, 'appointmentDetail']
+    )->name('patient.appointments.show');
+    
     Route::post('Patient/Appointment/UpdateStatus', [PatientController::class, 'appointmentCancel']);
     // Doctor Search
     Route::get(
