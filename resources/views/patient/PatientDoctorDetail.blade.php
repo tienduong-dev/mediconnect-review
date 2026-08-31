@@ -22,6 +22,43 @@
 
 <div class="container my-5">
 
+    @if (session('booking_success'))
+
+        <div class="alert alert-success mb-4">
+
+            <strong>
+                {{ session('booking_success') }}
+            </strong>
+
+            @if (session('appointment_number'))
+
+                <div class="mt-1">
+
+                    Appointment Number:
+
+                    <strong>
+                        {{ session('appointment_number') }}
+                    </strong>
+
+                </div>
+
+            @endif
+
+        </div>
+
+    @endif
+
+
+    @if (session('booking_error'))
+
+        <div class="alert alert-danger mb-4">
+
+            {{ session('booking_error') }}
+
+        </div>
+
+    @endif
+
     {{-- Back --}}
     <div class="mb-4">
 
@@ -594,6 +631,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 `;
 
             }
+        }
+    );
+    // =========================
+    // CONTINUE BOOKING
+    // =========================
+    continueButton.addEventListener(
+        'click',
+        function () {
+
+            const slotId =
+                selectedSlotInput.value;
+
+
+            if (!slotId) {
+                return;
+            }
+
+
+            window.location.href =
+                `/appointments/confirm/${slotId}`;
         }
     );
 

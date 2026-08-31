@@ -10,6 +10,7 @@ use App\Http\Controllers\DoctorSearchController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\LocalController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\AppointmentBookingController;
 
 
 // ================ Patient Register Router's ================
@@ -129,6 +130,18 @@ Route::middleware(['isPatient'])->group(function () {
         '/doctors/{assignmentId}',
         [DoctorSearchController::class, 'show']
     )->name('patient.doctor.show');
+
+    // Appointment Booking
+    Route::get(
+        '/appointments/confirm/{slotId}',
+        [AppointmentBookingController::class, 'confirm']
+    )->name('patient.appointment.confirm');
+
+
+    Route::post(
+        '/appointments/book',
+        [AppointmentBookingController::class, 'store']
+    )->name('patient.appointment.store');
 });
 
 // views routers 
