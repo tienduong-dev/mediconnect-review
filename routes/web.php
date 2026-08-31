@@ -116,6 +116,16 @@ Route::middleware(['isPatient'])->group(function () {
     );
 
     Route::get(
+        '/doctors/{assignmentId}/available-dates',
+        [DoctorSearchController::class, 'getAvailableDates']
+    );
+
+    Route::get(
+        '/doctors/{assignmentId}/slots',
+        [DoctorSearchController::class, 'getAvailableSlots']
+    );
+
+    Route::get(
         '/doctors/{assignmentId}',
         [DoctorSearchController::class, 'show']
     )->name('patient.doctor.show');

@@ -21,6 +21,17 @@ class DoctorAssignment extends Model
 
     public function facilitySpecialization()
     {
-        return $this->belongsTo(FacilitySpecialization::class);
+        return $this->belongsTo(
+            FacilitySpecialization::class,
+            'facility_specialization_id'
+        );
+    }
+
+    public function appointmentSlots()
+    {
+        return $this->hasMany(
+            DoctorAppointmentSlot::class,
+            'doctor_assignment_id'
+        );
     }
 }

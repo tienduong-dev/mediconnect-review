@@ -294,22 +294,67 @@
                 </p>
 
 
-                {{-- Booking will be connected in Step 7 --}}
+                {{-- Appointment Date --}}
+                <div class="text-start mb-3">
+
+                    <label
+                        for="appointment_date"
+                        class="fw-semibold mb-2"
+                    >
+                        Appointment Date
+                    </label>
+
+                    <select
+                        id="appointment_date"
+                        class="appointment-date-select"
+                    >
+                        <option value="" disabled selected>
+                            Select Date
+                        </option>
+                    </select>
+
+                </div>
+
+
+                {{-- Available Slots --}}
+                <div class="text-start mb-3">
+
+                    <label class="fw-semibold mb-2">
+                        Available Time
+                    </label>
+
+                    <div
+                        id="available-slots"
+                        class="d-flex flex-wrap gap-2"
+                    >
+                        <span class="text-muted">
+                            Select a date first.
+                        </span>
+                    </div>
+
+                </div>
+
+
+                {{-- Selected slot --}}
+                <input
+                    type="hidden"
+                    id="selected_slot_id"
+                    value=""
+                >
+
+
+                {{-- Continue button --}}
                 <button
                     type="button"
+                    id="continue-booking"
                     class="common-btn box-style p2-bg w-100
-                           d-inline-flex justify-content-center
-                           align-items-center
-                           fs18 fw-semibold white
-                           overflow-hidden rounded100"
+                        d-inline-flex justify-content-center
+                        align-items-center fs18 fw-semibold
+                        white overflow-hidden rounded100"
                     disabled
                 >
-                    Select Appointment Time
+                    Continue Booking
                 </button>
-
-                <small class="text-muted d-block mt-2">
-                    Appointment slots will be available in the next step.
-                </small>
 
             </div>
 
@@ -318,5 +363,244 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const assignmentId = {{ $assignment->id }};
+
+    const dateSelect =
+        document.getElementById('appointment_date');
+
+    const slotsContainer =
+        document.getElementById('available-slots');
+
+    const selectedSlotInput =
+        document.getElementById('selected_slot_id');
+
+    const continueButton =
+        document.getElementById('continue-booking');
+
+    function refreshDateSelect() {
+        if (
+            window.jQuery &&
+            jQuery.fn.niceSelect
+        ) {
+            $('#appointment_date')
+                .niceSelect('update');
+        }
+    }
+
+
+    // =========================
+    // LOAD AVAILABLE DATES
+    // =========================
+    async function loadAvailableDates() {
+
+        try {
+
+            const response = await fetch(
+                `/doctors/${assignmentId}/available-dates`
+            );
+
+            const dates = await response.json();
+
+
+            if (dates.length === 0) {
+
+                dateSelect.innerHTML = `
+                    <option value="">
+                        No available dates
+                    </option>
+                `;
+
+                dateSelect.disabled = true;
+
+                refreshDateSelect();
+
+                slotsContainer.innerHTML = `
+                    <div class="alert alert-info w-100 mb-0">
+                        This doctor currently has no available appointment slots.
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            dateSelect.disabled = false;
+
+            dateSelect.innerHTML = `
+                <option value="" disabled selected>
+                    Select Date
+                </option>
+            `;
+
+
+            dates.forEach(function (date) {
+
+                const formattedDate =
+                    new Date(date + 'T00:00:00')
+                    .toLocaleDateString(
+                        'en-GB',
+                        {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        }
+                    );
+
+                dateSelect.innerHTML += `
+                    <option value="${date}">
+                        ${formattedDate}
+                    </option>
+                `;
+            });
+
+
+            refreshDateSelect();
+
+        } catch (error) {
+
+            slotsContainer.innerHTML = `
+                <div class="alert alert-danger w-100 mb-0">
+                    Unable to load available dates.
+                </div>
+            `;
+
+        }
+    }
+
+
+    // =========================
+    // DATE CHANGE
+    // =========================
+    dateSelect.addEventListener(
+        'change',
+        async function () {
+
+            const selectedDate = this.value;
+
+            selectedSlotInput.value = '';
+
+            continueButton.disabled = true;
+
+
+            if (!selectedDate) {
+
+                slotsContainer.innerHTML = `
+                    <span class="text-muted">
+                        Select a date first.
+                    </span>
+                `;
+
+                return;
+            }
+
+
+            slotsContainer.innerHTML = `
+                <span class="text-muted">
+                    Loading available slots...
+                </span>
+            `;
+
+
+            try {
+
+                const response = await fetch(
+                    `/doctors/${assignmentId}/slots?date=${selectedDate}`
+                );
+
+                const slots = await response.json();
+
+
+                if (slots.length === 0) {
+
+                    slotsContainer.innerHTML = `
+                        <div class="alert alert-info w-100 mb-0">
+                            No available slots for this date.
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+                slotsContainer.innerHTML = '';
+
+
+                slots.forEach(function (slot) {
+
+                    const button =
+                        document.createElement('button');
+
+                    button.type = 'button';
+
+                    button.className =
+                        'btn btn-outline-success slot-button';
+
+                    button.dataset.slotId = slot.id;
+
+                    button.textContent =
+                        `${slot.start_time} - ${slot.end_time}`;
+
+
+                    button.addEventListener(
+                        'click',
+                        function () {
+
+                            document
+                                .querySelectorAll('.slot-button')
+                                .forEach(function (item) {
+
+                                    item.classList.remove(
+                                        'btn-success',
+                                        'text-white'
+                                    );
+
+                                    item.classList.add(
+                                        'btn-outline-success'
+                                    );
+                                });
+
+
+                            this.classList.remove(
+                                'btn-outline-success'
+                            );
+
+                            this.classList.add(
+                                'btn-success',
+                                'text-white'
+                            );
+
+
+                            selectedSlotInput.value =
+                                this.dataset.slotId;
+
+                            continueButton.disabled = false;
+                        }
+                    );
+
+
+                    slotsContainer.appendChild(button);
+                });
+
+            } catch (error) {
+
+                slotsContainer.innerHTML = `
+                    <div class="alert alert-danger w-100 mb-0">
+                        Unable to load appointment slots.
+                    </div>
+                `;
+
+            }
+        }
+    );
+
+
+    loadAvailableDates();
+
+});
+</script>
 
 @endsection

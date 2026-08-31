@@ -7,6 +7,8 @@ use App\Models\Facility;
 use App\Models\Specialization;
 use App\Models\FacilitySpecialization;
 use App\Models\DoctorAssignment;
+use App\Models\DoctorAppointmentSlot;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DoctorSearchController extends Controller
@@ -158,5 +160,78 @@ class DoctorSearchController extends Controller
             'patient.PatientDoctorDetail',
             compact('assignment')
         );
+    }
+    // Get dates that still have available slots
+    public function getAvailableDates($assignmentId)
+    {
+        $dates = DoctorAppointmentSlot::where(
+                'doctor_assignment_id',
+                $assignmentId
+            )
+            ->where('status', 'Available')
+            ->whereDate('slot_date', '>=', today())
+            ->select('slot_date')
+            ->distinct()
+            ->orderBy('slot_date')
+            ->pluck('slot_date')
+            ->map(function ($date) {
+                return Carbon::parse($date)->format('Y-m-d');
+            })
+            ->values();
+
+        return response()->json($dates);
+    }
+    // Get available slots for selected date
+    public function getAvailableSlots(Request $request, $assignmentId)
+    {
+        $validated = $request->validate([
+            'date' => 'required|date',
+        ]);
+
+        $query = DoctorAppointmentSlot::where(
+                'doctor_assignment_id',
+                $assignmentId
+            )
+            ->whereDate('slot_date', $validated['date'])
+            ->where('status', 'Available');
+
+        // Nếu chọn chính ngày hôm nay,
+        // không hiển thị giờ đã trôi qua
+        if ($validated['date'] === today()->format('Y-m-d')) {
+            $query->whereTime(
+                'start_time',
+                '>',
+                now()->format('H:i:s')
+            );
+        }
+
+        $slots = $query
+            ->orderBy('start_time')
+            ->get([
+                'id',
+                'slot_date',
+                'start_time',
+                'end_time',
+            ])
+            ->map(function ($slot) {
+
+                return [
+                    'id' => $slot->id,
+
+                    'date' => Carbon::parse(
+                        $slot->slot_date
+                    )->format('Y-m-d'),
+
+                    'start_time' => Carbon::parse(
+                        $slot->start_time
+                    )->format('H:i'),
+
+                    'end_time' => Carbon::parse(
+                        $slot->end_time
+                    )->format('H:i'),
+                ];
+            });
+
+        return response()->json($slots);
     }
 }
