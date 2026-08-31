@@ -11,6 +11,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\LocalController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\AppointmentBookingController;
+use App\Http\Controllers\AppointmentManagementController;
 
 
 // ================ Patient Register Router's ================
@@ -153,6 +154,24 @@ Route::middleware(['isPatient'])->group(function () {
         '/appointments/book',
         [AppointmentBookingController::class, 'store']
     )->name('patient.appointment.store');
+
+    // Reschedule Appointment
+    Route::get(
+        '/Patient/Appointments/{id}/Reschedule',
+        [
+            AppointmentManagementController::class,
+            'rescheduleForm'
+        ]
+    )->name('patient.appointments.reschedule');
+
+
+    Route::post(
+        '/Patient/Appointments/{id}/Reschedule',
+        [
+            AppointmentManagementController::class,
+            'reschedule'
+        ]
+    )->name('patient.appointments.reschedule.update');
 });
 
 // views routers 

@@ -26,6 +26,23 @@
 
 
 <div class="container my-5">
+    
+    @if (session('success'))
+
+        <div class="alert alert-success mb-4">
+            {{ session('success') }}
+        </div>
+
+    @endif
+
+
+    @if (session('error'))
+
+        <div class="alert alert-danger mb-4">
+            {{ session('error') }}
+        </div>
+
+    @endif
 
     <div class="mb-4">
 
@@ -262,18 +279,29 @@
                 </div>
 
 
-                {{-- Actions will be added later --}}
                 @if (
                     $appointment->status === 'Pending' ||
                     $appointment->status === 'Confirmed'
                 )
 
-                    <div class="mt-4">
+                    <div class="mt-4 d-flex gap-3 flex-wrap">
 
-                        <small class="text-muted">
-                            Reschedule and cancellation options
-                            will be available here.
-                        </small>
+                        <a
+                            href="{{ route(
+                                'patient.appointments.reschedule',
+                                $appointment->id
+                            ) }}"
+                            class="common-btn box-style p2-bg
+                                d-inline-flex justify-content-center
+                                align-items-center
+                                fs16 fw-semibold white
+                                overflow-hidden rounded100"
+                            style="padding: 10px 20px;"
+                        >
+                            Reschedule
+                        </a>
+
+                        {{-- Cancel button will be added in Step 11 --}}
 
                     </div>
 
