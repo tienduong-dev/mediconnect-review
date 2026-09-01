@@ -172,6 +172,24 @@ Route::middleware(['isPatient'])->group(function () {
             'reschedule'
         ]
     )->name('patient.appointments.reschedule.update');
+
+    // Cancel Appointment
+    Route::get(
+        '/Patient/Appointments/{id}/Cancel',
+        [
+            AppointmentManagementController::class,
+            'cancelForm'
+        ]
+    )->name('patient.appointments.cancel');
+
+
+    Route::post(
+        '/Patient/Appointments/{id}/Cancel',
+        [
+            AppointmentManagementController::class,
+            'cancel'
+        ]
+    )->name('patient.appointments.cancel.update');
 });
 
 // views routers 

@@ -48,6 +48,7 @@ class PatientController extends Controller
             'doctorAssignment.facilitySpecialization.facility.city',
             'doctorAssignment.facilitySpecialization.specialization',
             'slot',
+            'histories.changedBy',
         ])
         ->where('patient_user_id', Auth::id())
         ->findOrFail($id);
@@ -67,19 +68,6 @@ class PatientController extends Controller
         return view('patient.PatientProfile', compact('user'));
     }
 
-
-    // Cancel Appointment
-
-    public function appointmentCancel(Request $req)
-    {
-        $appointment = Appointments::find($req->id);
-
-        $appointment->status = $req->status;
-        $appointment->save();
-
-        return redirect('Patient/AppointmentHistory')
-            ->with('update', 'Appointment canceled!');
-    }
 
 
     // Show edit profile form for current patient

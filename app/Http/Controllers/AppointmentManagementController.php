@@ -7,6 +7,7 @@ use App\Models\AppointmentHistory;
 use App\Models\DoctorAppointmentSlot;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -282,6 +283,224 @@ class AppointmentManagementController extends Controller
             ->with(
                 'success',
                 'Appointment rescheduled successfully.'
+            );
+    }
+
+    // Show cancel appointment page
+    public function cancelForm($id)
+    {
+        $appointment = Appointments::with([
+            'doctorAssignment.doctor.user',
+            'doctorAssignment.facilitySpecialization.facility',
+            'doctorAssignment.facilitySpecialization.specialization',
+            'slot',
+        ])
+        ->where('patient_user_id', Auth::id())
+        ->findOrFail($id);
+
+
+        // Only Pending or Confirmed appointments can be cancelled
+        if (!in_array(
+            $appointment->status,
+            ['Pending', 'Confirmed']
+        )) {
+            return redirect()
+                ->route(
+                    'patient.appointments.show',
+                    $appointment->id
+                )
+                ->with(
+                    'error',
+                    'This appointment cannot be cancelled.'
+                );
+        }
+
+
+        // Past appointments cannot be cancelled
+        $appointmentStart = Carbon::parse(
+            $appointment->appointment_date->format('Y-m-d')
+            . ' '
+            . $appointment->start_time
+        );
+
+
+        if ($appointmentStart->lte(now())) {
+            return redirect()
+                ->route(
+                    'patient.appointments.show',
+                    $appointment->id
+                )
+                ->with(
+                    'error',
+                    'Past appointments cannot be cancelled.'
+                );
+        }
+
+
+        return view(
+            'patient.PatientAppointmentCancel',
+            compact('appointment')
+        );
+    }
+
+    // Cancel appointment
+    public function cancel(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'cancellation_reason' => [
+                'required',
+                'string',
+                'max:500',
+            ],
+        ]);
+
+
+        DB::transaction(function () use (
+            $validated,
+            $id
+        ) {
+
+            // Lock appointment to prevent simultaneous changes
+            $appointment = Appointments::where(
+                    'patient_user_id',
+                    Auth::id()
+                )
+                ->where('id', $id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+
+            // Check status again inside transaction
+            if (!in_array(
+                $appointment->status,
+                ['Pending', 'Confirmed']
+            )) {
+                throw ValidationException::withMessages([
+                    'cancellation_reason' =>
+                        'This appointment can no longer be cancelled.',
+                ]);
+            }
+
+
+            // Check appointment time again
+            $appointmentStart = Carbon::parse(
+                $appointment->appointment_date->format('Y-m-d')
+                . ' '
+                . $appointment->start_time
+            );
+
+
+            if ($appointmentStart->lte(now())) {
+                throw ValidationException::withMessages([
+                    'cancellation_reason' =>
+                        'Past appointments cannot be cancelled.',
+                ]);
+            }
+
+
+            $oldStatus =
+                $appointment->status;
+
+            $oldSlotId =
+                $appointment->slot_id;
+
+            $assignmentId =
+                $appointment->doctor_assignment_id;
+
+
+            /*
+            * Release booked slot
+            */
+            if ($oldSlotId) {
+
+                $slot = DoctorAppointmentSlot::where(
+                        'id',
+                        $oldSlotId
+                    )
+                    ->lockForUpdate()
+                    ->first();
+
+
+                if ($slot) {
+
+                    $slot->status =
+                        'Available';
+
+                    $slot->booked_at =
+                        null;
+
+                    $slot->held_at =
+                        null;
+
+                    $slot->save();
+                }
+            }
+
+
+            /*
+            * Cancel appointment
+            */
+            $appointment->status =
+                'Cancelled';
+
+            $appointment->cancellation_reason =
+                $validated['cancellation_reason'];
+
+            $appointment->cancelled_at =
+                now();
+
+            $appointment->save();
+
+
+            /*
+            * Record appointment history
+            */
+            AppointmentHistory::create([
+                'appointment_id' =>
+                    $appointment->id,
+
+                'changed_by_user_id' =>
+                    Auth::id(),
+
+                'action' =>
+                    'Cancelled',
+
+                'old_status' =>
+                    $oldStatus,
+
+                'new_status' =>
+                    'Cancelled',
+
+                'old_doctor_assignment_id' =>
+                    $assignmentId,
+
+                'new_doctor_assignment_id' =>
+                    $assignmentId,
+
+                'old_slot_id' =>
+                    $oldSlotId,
+
+                'new_slot_id' =>
+                    $oldSlotId,
+
+                'note' =>
+                    Str::limit(
+                        'Appointment cancelled by patient. Reason: '
+                        . $validated['cancellation_reason'],
+                        500
+                    ),
+            ]);
+        });
+
+
+        return redirect()
+            ->route(
+                'patient.appointments.show',
+                $id
+            )
+            ->with(
+                'success',
+                'Appointment cancelled successfully.'
             );
     }
 }

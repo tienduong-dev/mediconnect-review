@@ -209,8 +209,33 @@
                     <p class="mb-0">
 
                         <strong>Status:</strong>
-
                         {{ $appointment->status }}
+                        @if (
+                            $appointment->status === 'Cancelled' &&
+                            $appointment->cancellation_reason
+                        )
+                            <p class="mb-2 mt-3">
+                                <strong>
+                                    Cancellation Reason:
+                                </strong>
+                                {{ $appointment->cancellation_reason }}
+                            </p>
+
+
+                            <p class="mb-0">
+
+                                <strong>
+                                    Cancelled At:
+                                </strong>
+
+                                {{ $appointment->cancelled_at
+                                    ? $appointment->cancelled_at
+                                        ->format('d/m/Y H:i')
+                                    : 'N/A' }}
+
+                            </p>
+
+                        @endif
 
                     </p>
 
@@ -248,6 +273,98 @@
                     <h5 class="black mb-3">
                         Visit Information
                     </h5>
+
+                    {{-- Appointment History --}}
+                    <div class="border rounded-4 p-4 mt-4">
+
+                        <h5 class="black mb-3">
+                            Appointment History
+                        </h5>
+
+
+                        @if ($appointment->histories->isEmpty())
+
+                            <p class="text-muted mb-0">
+                                No history available.
+                            </p>
+
+                        @else
+
+                            <div class="d-flex flex-column gap-3">
+
+                                @foreach (
+                                    $appointment->histories
+                                        ->sortByDesc('created_at')
+                                    as $history
+                                )
+
+                                    <div class="border-bottom pb-3">
+
+                                        <div class="d-flex
+                                                    justify-content-between
+                                                    align-items-start
+                                                    gap-3">
+
+                                            <div>
+
+                                                <strong>
+                                                    {{ $history->action }}
+                                                </strong>
+
+
+                                                @if (
+                                                    $history->old_status ||
+                                                    $history->new_status
+                                                )
+
+                                                    <div class="text-muted mt-1">
+
+                                                        @if ($history->old_status)
+
+                                                            {{ $history->old_status }}
+
+                                                            →
+
+                                                        @endif
+
+                                                        {{ $history->new_status }}
+
+                                                    </div>
+
+                                                @endif
+
+                                            </div>
+
+
+                                            <small class="text-muted">
+
+                                                {{ $history->created_at
+                                                    ? $history->created_at
+                                                        ->format('d/m/Y H:i')
+                                                    : '' }}
+
+                                            </small>
+
+                                        </div>
+
+
+                                        @if ($history->note)
+
+                                            <p class="mb-0 mt-2">
+                                                {{ $history->note }}
+                                            </p>
+
+                                        @endif
+
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                        @endif
+
+                    </div>
 
                     <p class="mb-3">
 
@@ -301,7 +418,19 @@
                             Reschedule
                         </a>
 
-                        {{-- Cancel button will be added in Step 11 --}}
+                        <a
+                            href="{{ route(
+                                'patient.appointments.cancel',
+                                $appointment->id
+                            ) }}"
+                            class="btn btn-outline-danger
+                                rounded-pill px-4
+                                d-inline-flex
+                                justify-content-center
+                                align-items-center"
+                        >
+                            Cancel Appointment
+                        </a>
 
                     </div>
 
