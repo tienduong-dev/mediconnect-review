@@ -13,6 +13,8 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\AppointmentBookingController;
 use App\Http\Controllers\AppointmentManagementController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\MedicalContentController;
+use App\Http\Controllers\ContactController;
 
 
 // ================ Patient Register Router's ================
@@ -208,6 +210,23 @@ Route::middleware(['isPatient'])->group(function () {
         '/Patient/Notifications/{id}/Read',
         [NotificationController::class, 'markAsRead']
     )->name('patient.notifications.read');
+
+    // Medical Contents
+    Route::get(
+        '/Patient/MedicalContents',
+        [
+            MedicalContentController::class,
+            'index'
+        ]
+    )->name('patient.medical.contents');
+    
+    Route::get(
+    '/Patient/MedicalContents/{slug}',
+    [
+        MedicalContentController::class,
+        'show'
+    ]
+    )->name('patient.medical.contents.show');
 });
 
 // views routers 
@@ -233,6 +252,14 @@ Route::get('/index3', function () {
 Route::get('/about', function () {
     return view('about');
 });
-Route::get('/contact', function () {
-    return view('contact');
-});
+// Contact Us
+Route::get(
+    '/contact',
+    [ContactController::class, 'show']
+)->name('contact');
+
+
+Route::post(
+    '/contact',
+    [ContactController::class, 'store']
+)->name('contact.store');

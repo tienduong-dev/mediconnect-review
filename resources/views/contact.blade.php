@@ -70,6 +70,257 @@
         </div>
     </section>
 
+    {{-- Contact Form --}}
+    <section class="pb-5">
+
+        <div class="container">
+
+            <div class="row justify-content-center">
+
+                <div class="col-lg-9">
+
+                    <div class="bg-white
+                                rounded-4
+                                shadow-sm
+                                p-4
+                                p-lg-5">
+
+                        <div class="text-center mb-4">
+
+                            <h2 class="black mb-2">
+                                Contact Us
+                            </h2>
+
+                            <p class="pra mb-0">
+                                Have a question?
+                                Send us a message and we will
+                                get back to you.
+                            </p>
+
+                        </div>
+
+
+                        {{-- Success Message --}}
+                        @if (session('success'))
+
+                            <div class="alert alert-success">
+
+                                {{ session('success') }}
+
+                            </div>
+
+                        @endif
+
+
+                        {{-- Validation Errors --}}
+                        @if ($errors->any())
+
+                            <div class="alert alert-danger">
+
+                                <ul class="mb-0">
+
+                                    @foreach ($errors->all() as $error)
+
+                                        <li>
+                                            {{ $error }}
+                                        </li>
+
+                                    @endforeach
+
+                                </ul>
+
+                            </div>
+
+                        @endif
+
+
+                        <form
+                            action="{{ route('contact.store') }}"
+                            method="POST"
+                        >
+
+                            @csrf
+
+
+                            <div class="row g-4">
+
+                                {{-- Name --}}
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="name"
+                                        class="fw-semibold mb-2"
+                                    >
+                                        Name
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        id="name"
+                                        class="form-control"
+                                        value="{{ old(
+                                            'name',
+                                            auth()->check()
+                                                ? auth()->user()->name
+                                                : ''
+                                        ) }}"
+                                        placeholder="Enter your name"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                {{-- Email --}}
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="email"
+                                        class="fw-semibold mb-2"
+                                    >
+                                        Email
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        id="email"
+                                        class="form-control"
+                                        value="{{ old(
+                                            'email',
+                                            auth()->check()
+                                                ? auth()->user()->email
+                                                : ''
+                                        ) }}"
+                                        placeholder="Enter your email"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                {{-- Phone --}}
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="phone"
+                                        class="fw-semibold mb-2"
+                                    >
+                                        Phone
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="phone"
+                                        id="phone"
+                                        class="form-control"
+                                        value="{{ old(
+                                            'phone',
+                                            auth()->check()
+                                                ? auth()->user()->number
+                                                : ''
+                                        ) }}"
+                                        placeholder="Enter your phone number"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                {{-- Subject --}}
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="subject"
+                                        class="fw-semibold mb-2"
+                                    >
+                                        Subject
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="subject"
+                                        id="subject"
+                                        class="form-control"
+                                        value="{{ old('subject') }}"
+                                        placeholder="Enter subject"
+                                    >
+
+                                </div>
+
+
+                                {{-- Message --}}
+                                <div class="col-12">
+
+                                    <label
+                                        for="message"
+                                        class="fw-semibold mb-2"
+                                    >
+                                        Message
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <textarea
+                                        name="message"
+                                        id="message"
+                                        rows="6"
+                                        class="form-control"
+                                        maxlength="2000"
+                                        placeholder="Enter your message"
+                                        required
+                                    >{{ old('message') }}</textarea>
+
+                                    <small class="text-muted">
+                                        Maximum 2000 characters.
+                                    </small>
+
+                                </div>
+
+
+                                {{-- Submit --}}
+                                <div class="col-12 text-center">
+
+                                    <button
+                                        type="submit"
+                                        class="common-btn
+                                            box-style
+                                            p2-bg
+                                            d-inline-flex
+                                            justify-content-center
+                                            align-items-center
+                                            fs16
+                                            fw-semibold
+                                            white
+                                            overflow-hidden
+                                            rounded100"
+                                        style="
+                                            padding: 12px 35px;
+                                            min-width: 180px;
+                                        "
+                                    >
+                                        Send Message
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
     <!-- Map -->
     <div class="space-bottom">
         <div class="map-area">

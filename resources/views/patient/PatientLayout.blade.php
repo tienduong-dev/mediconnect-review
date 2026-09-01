@@ -137,6 +137,7 @@
 
                                             </a>
                                         </li>
+                                        <li><a href="{{ route('patient.medical.contents') }}">Medical Knowledge</a></li>
                                         <li><a href="{{ url('contact') }}">Contact</a></li>
                                         @if (auth()->user())
                                             <li class="has-dropdown"><a href="{{ url('logout') }}"
