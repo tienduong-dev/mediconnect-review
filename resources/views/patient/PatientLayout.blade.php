@@ -115,6 +115,28 @@
                                         <li><a href="{{ url('about') }}">About Us</a></li>
                                         <li><a href="{{ url('doctors') }}">Doctor</a></li>
                                         <li><a href="{{ route('patient.appointments') }}">My Appointments</a></li>
+                                        <li>
+                                            <a href="{{ route('patient.notifications') }}">
+
+                                                Notifications
+
+                                                @if (
+                                                    auth()->check() &&
+                                                    auth()->user()->unreadNotifications->count() > 0
+                                                )
+
+                                                    <span class="badge bg-danger ms-1">
+
+                                                        {{ auth()->user()
+                                                            ->unreadNotifications
+                                                            ->count() }}
+
+                                                    </span>
+
+                                                @endif
+
+                                            </a>
+                                        </li>
                                         <li><a href="{{ url('contact') }}">Contact</a></li>
                                         @if (auth()->user())
                                             <li class="has-dropdown"><a href="{{ url('logout') }}"

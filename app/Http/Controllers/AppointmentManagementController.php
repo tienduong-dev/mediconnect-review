@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Appointments;
 use App\Models\AppointmentHistory;
 use App\Models\DoctorAppointmentSlot;
+use App\Notifications\AppointmentRescheduledNotification;
+use App\Notifications\AppointmentCancelledNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -83,7 +85,7 @@ class AppointmentManagementController extends Controller
         ]);
 
 
-        DB::transaction(function () use (
+        $appointment = DB::transaction(function () use (
             $validated,
             $id
         ) {
@@ -272,7 +274,14 @@ class AppointmentManagementController extends Controller
                 'note' =>
                     'Appointment rescheduled by patient.',
             ]);
+            return $appointment;
         });
+
+        Auth::user()->notify(
+            new AppointmentRescheduledNotification(
+                $appointment
+            )
+        );
 
 
         return redirect()
@@ -355,7 +364,7 @@ class AppointmentManagementController extends Controller
         ]);
 
 
-        DB::transaction(function () use (
+        $appointment = DB::transaction(function () use (
             $validated,
             $id
         ) {
@@ -490,7 +499,13 @@ class AppointmentManagementController extends Controller
                         500
                     ),
             ]);
+            return $appointment;
         });
+        Auth::user()->notify(
+            new AppointmentCancelledNotification(
+                $appointment
+            )
+        );
 
 
         return redirect()

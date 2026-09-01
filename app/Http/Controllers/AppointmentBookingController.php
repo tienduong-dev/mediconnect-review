@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Appointments;
 use App\Models\AppointmentHistory;
 use App\Models\DoctorAppointmentSlot;
+use App\Notifications\AppointmentBookedNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+
 
 class AppointmentBookingController extends Controller
 {
@@ -257,6 +259,12 @@ class AppointmentBookingController extends Controller
 
             return $appointment;
         });
+
+        $user->notify(
+            new AppointmentBookedNotification(
+                $appointment
+            )
+        );
 
 
         return redirect(

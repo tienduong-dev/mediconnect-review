@@ -12,6 +12,7 @@ use App\Http\Controllers\LocalController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\AppointmentBookingController;
 use App\Http\Controllers\AppointmentManagementController;
+use App\Http\Controllers\NotificationController;
 
 
 // ================ Patient Register Router's ================
@@ -190,6 +191,23 @@ Route::middleware(['isPatient'])->group(function () {
             'cancel'
         ]
     )->name('patient.appointments.cancel.update');
+    // Patient Notifications
+    Route::get(
+        '/Patient/Notifications',
+        [NotificationController::class, 'index']
+    )->name('patient.notifications');
+
+
+    Route::post(
+        '/Patient/Notifications/ReadAll',
+        [NotificationController::class, 'markAllAsRead']
+    )->name('patient.notifications.readAll');
+
+
+    Route::post(
+        '/Patient/Notifications/{id}/Read',
+        [NotificationController::class, 'markAsRead']
+    )->name('patient.notifications.read');
 });
 
 // views routers 
