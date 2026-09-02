@@ -14,7 +14,7 @@ class AdminSeed extends Seeder{
         User::create([
             'name'=>'Vishal',
             'email'=>'admin@gmail.com',
-            'password'=>'admin',
+            'password'=>'Admin@123',
             'number'=>1234567890,
             'user_type'=>'admin'
         ]);
