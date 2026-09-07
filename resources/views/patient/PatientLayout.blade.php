@@ -50,20 +50,35 @@
                 <span data-text-preloader="M" class="letters-loading">
                     M
                 </span>
+                <span data-text-preloader="E" class="letters-loading">
+                    E
+                </span>
                 <span data-text-preloader="D" class="letters-loading">
                     D
                 </span>
                 <span data-text-preloader="I" class="letters-loading">
                     I
                 </span>
-                <span data-text-preloader="Z" class="letters-loading">
-                    Z
+                <span data-text-preloader="C" class="letters-loading">
+                    C
+                </span>
+                <span data-text-preloader="O" class="letters-loading">
+                    O
+                </span>
+                <span data-text-preloader="N" class="letters-loading">
+                    N
+                </span>
+                <span data-text-preloader="N" class="letters-loading">
+                    N
                 </span>
                 <span data-text-preloader="E" class="letters-loading">
                     E
                 </span>
-                <span data-text-preloader="N" class="letters-loading">
-                    N
+                <span data-text-preloader="C" class="letters-loading">
+                    C
+                </span>
+                <span data-text-preloader="T" class="letters-loading">
+                    T
                 </span>
             </div>
             <p class="text-center">Loading</p>
@@ -102,7 +117,7 @@
                     <div class="header-left">
                         <div class="logo">
                             <a href="{{ url('Patient/PatientDashboard') }}" class="header-logo">
-                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img">
+                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img" width="150px">
                             </a>
                         </div>
                     </div>
@@ -229,7 +244,7 @@
                     <div class="offcanvas__top mb-4 d-flex justify-content-between align-items-center">
                         <div class="offcanvas__logo">
                             <a href="{{ url('Patient/PatientDashboard') }}">
-                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img">
+                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img" width="150px">
                             </a>
                         </div>
                         <div class="offcanvas__close">
