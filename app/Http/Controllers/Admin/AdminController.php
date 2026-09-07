@@ -15,11 +15,59 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $total_doctor  = User::where('user_type', 'Doctor')->count();
-        $total_patient = User::where('user_type', 'Patient')->count();
-        $total_apt     = Appointments::count();
+        // Accounts, split by the account_status the admin can toggle
+        $accounts = [
+            'doctors_total'    => User::where('user_type', 'Doctor')->count(),
+            'doctors_active'   => User::where('user_type', 'Doctor')->where('account_status', 'Active')->count(),
+            'patients_total'   => User::where('user_type', 'Patient')->count(),
+            'patients_active'  => User::where('user_type', 'Patient')->where('account_status', 'Active')->count(),
+            'doctors_no_profile' => User::where('user_type', 'Doctor')
+                ->whereDoesntHave('doctorDetails')->count(),
+        ];
 
-        return view('admin.AdminDashboard', compact('total_doctor', 'total_patient', 'total_apt'));
+        // One grouped query instead of six counts
+        $byStatus = DB::table('appointments')
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $appointments = [
+            'total'     => (int) $byStatus->sum(),
+            'pending'   => (int) ($byStatus['Pending'] ?? 0),
+            'confirmed' => (int) ($byStatus['Confirmed'] ?? 0),
+            'completed' => (int) ($byStatus['Completed'] ?? 0),
+            'cancelled' => (int) ($byStatus['Cancelled'] ?? 0),
+            'rejected'  => (int) ($byStatus['Rejected'] ?? 0),
+            'no_show'   => (int) ($byStatus['NoShow'] ?? 0),
+            'today'     => DB::table('appointments')->whereDate('appointment_date', now()->toDateString())->count(),
+        ];
+
+        // Master data the booking flow depends on; a zero here breaks patient search
+        $masterData = [
+            'cities'          => DB::table('cities')->where('status', 'Active')->count(),
+            'facilities'      => DB::table('facilities')->where('status', 'Active')->count(),
+            'specializations' => DB::table('specializations')->where('status', 'Active')->count(),
+            'assignments'     => DB::table('doctor_assignments')->where('status', 'Active')->count(),
+            'open_slots'      => DB::table('doctor_appointment_slots')->where('status', 'Available')->count(),
+        ];
+
+        $newContactMessages = DB::table('contact_messages')->where('status', 'New')->count();
+
+        // Queue the admin actually has to act on
+        $pendingQueue = DB::table('appointments')
+            ->where('status', 'Pending')
+            ->orderBy('appointment_date')
+            ->orderBy('start_time')
+            ->limit(5)
+            ->get(['appointment_number', 'patient_name', 'appointment_date', 'start_time']);
+
+        return view('admin.AdminDashboard', compact(
+            'accounts',
+            'appointments',
+            'masterData',
+            'newContactMessages',
+            'pendingQueue'
+        ));
     }
 
     // ============= Appointment Control =============
@@ -43,15 +91,6 @@ class AdminController extends Controller
         $appointment->save();
 
         return redirect('Admin/AdminDashboard');
-    }
-
-    // ============= Patient Control =============
-
-    public function patientList()
-    {
-        $patients = User::where('user_type', 'Patient')->paginate(8);
-
-        return view('admin.AdminPatients', compact('patients'));
     }
 
     // ============= Account Control =============
@@ -130,11 +169,32 @@ class AdminController extends Controller
             ->with('DoctorRegisterOKay', 'Doctor account created. Please fill in the professional profile next.');
     }
 
-    public function doctorsList()
+    public function doctorsList(Request $req)
     {
-        $doctors = User::with(['doctorDetails:id,user_id,status'])
-            ->where('user_type', 'Doctor')
-            ->paginate(8);
+        $query = User::with(['doctorDetails:id,user_id,status,expertise'])
+            ->where('user_type', 'Doctor');
+
+        if ($req->filled('keyword')) {
+            $keyword = $req->keyword;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', '%' . $keyword . '%')
+                    ->orWhere('email', 'like', '%' . $keyword . '%')
+                    ->orWhere('number', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        if ($req->filled('account_status')) {
+            $query->where('account_status', $req->account_status);
+        }
+
+        // Doctors whose professional profile is still missing
+        if ($req->input('profile') === 'missing') {
+            $query->whereDoesntHave('doctorDetails');
+        } elseif ($req->filled('profile')) {
+            $query->whereHas('doctorDetails', fn($q) => $q->where('status', $req->profile));
+        }
+
+        $doctors = $query->orderBy('name')->paginate(10)->withQueryString();
 
         return view('admin.AdminDoctors', compact('doctors'));
     }
