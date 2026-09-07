@@ -5,9 +5,8 @@
 
         @include('admin.partials.flash')
 
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i>
-            An assignment defines <strong>which facility and specialization a doctor works in, the room number and the
+        <div class="helper-note">
+                        An assignment defines <strong>which facility and specialization a doctor works in, the room number and the
             consultation fee</strong>. A doctor without an assignment will not appear in patient search results and cannot
             have a working schedule.
         </div>
@@ -84,7 +83,7 @@
                                     <form method="POST" action="{{ url('Admin/DoctorAssignments/ToggleStatus', $a->id) }}"
                                         class="d-inline">
                                         @csrf
-                                        <button class="btn btn-sm {{ $a->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
+                                        <button class="btn btn-sm status-pill {{ $a->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
                                             title="Click to toggle status">
                                             {{ $a->status }}
                                         </button>
@@ -93,13 +92,13 @@
                                 <td class="text-center text-nowrap">
                                     <a href="{{ url('Admin/DoctorAssignments/Edit', $a->id) }}"
                                         class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
+                                        <i class="bi bi-pencil"></i> Edit
                                     </a>
                                     <form method="POST" action="{{ url('Admin/DoctorAssignments/Delete', $a->id) }}"
                                         class="d-inline"
                                         onsubmit="return confirm('Deleting this assignment also removes its schedules and generated slots. Continue?')">
                                         @csrf
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
                                     </form>
                                 </td>
                             </tr>
