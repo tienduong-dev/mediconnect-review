@@ -59,9 +59,7 @@ Route::middleware(['isAdmin'])->group(function () {
     Route::get('Admin/Patient/DeleteThis/{id}', [AdminController::class, 'deleteThisPatient']);
 
     // ------ Admin Doctor Control Router's ------
-    Route::get('Admin/DoctorRegister', function () {
-        return view('admin.AdminDoctorRegister');
-    });
+    Route::get('Admin/DoctorRegister', [AdminController::class, 'showDoctorRegisterForm']);
     Route::post('Admin/RegisterThisDoctorNow', [AdminController::class, 'registerDoctor']);
     Route::get('Admin/Doctors', [AdminController::class, 'doctorsList']);
     Route::get('Admin/DoctorProfile/{id}', [AdminController::class, 'getThisDoctorProfile']);
