@@ -15,12 +15,13 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MedicalContentController;
 use App\Http\Controllers\ContactController;
 
-// ------ Admin Controllers (tat ca nam trong App\Http\Controllers\Admin) ------
+// ------ Admin controllers (all live in App\Http\Controllers\Admin) ------
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\SpecializationController;
 use App\Http\Controllers\Admin\FacilitySpecializationController;
+use App\Http\Controllers\Admin\DoctorAssignmentController;
 
 
 // ================ Patient Register Router's ================
@@ -78,7 +79,7 @@ Route::middleware(['isAdmin'])->group(function () {
 
 
     // ==================================================================
-    // ------ Admin Master Data Router's (City / Facility / Specialization) ------
+    // ------ Admin master data routes (City / Facility / Specialization) ------
     // ==================================================================
 
     // Cities
@@ -116,6 +117,15 @@ Route::middleware(['isAdmin'])->group(function () {
     Route::post('Admin/FacilitySpecializations/Update/{id}', [FacilitySpecializationController::class, 'update']);
     Route::post('Admin/FacilitySpecializations/Delete/{id}', [FacilitySpecializationController::class, 'destroy']);
     Route::post('Admin/FacilitySpecializations/ToggleStatus/{id}', [FacilitySpecializationController::class, 'toggleStatus']);
+
+    // Doctor assignments (doctor <-> facility + specialization, room, consultation fee)
+    Route::get('Admin/DoctorAssignments', [DoctorAssignmentController::class, 'index']);
+    Route::get('Admin/DoctorAssignments/Create', [DoctorAssignmentController::class, 'create']);
+    Route::post('Admin/DoctorAssignments/Store', [DoctorAssignmentController::class, 'store']);
+    Route::get('Admin/DoctorAssignments/Edit/{id}', [DoctorAssignmentController::class, 'edit']);
+    Route::post('Admin/DoctorAssignments/Update/{id}', [DoctorAssignmentController::class, 'update']);
+    Route::post('Admin/DoctorAssignments/Delete/{id}', [DoctorAssignmentController::class, 'destroy']);
+    Route::post('Admin/DoctorAssignments/ToggleStatus/{id}', [DoctorAssignmentController::class, 'toggleStatus']);
 });
 
 Route::middleware(['isDoctor'])->group(function () {

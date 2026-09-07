@@ -137,7 +137,7 @@
                             <i class="bi bi-person-plus"></i> New Doctor Register
                         </a>
                     </li>
-                    {{-- ===== Master Data (du lieu nen cho luong dat lich) ===== --}}
+                    {{-- ===== Master data the booking flow depends on ===== --}}
                     <li class="nav-item mt-3 mb-1">
                         <span class="text-uppercase small fw-bold px-3" style="color:#8fa3bf; letter-spacing:1px;">
                             Master Data
@@ -161,6 +161,11 @@
                     <li class="nav-item mb-2">
                         <a href="{{ url('Admin/FacilitySpecializations') }}" class="nav-link text-white">
                             <i class="bi bi-diagram-3"></i> Facility Specializations
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="{{ url('Admin/DoctorAssignments') }}" class="nav-link text-white">
+                            <i class="bi bi-person-vcard"></i> Doctor Assignments
                         </a>
                     </li>
 
