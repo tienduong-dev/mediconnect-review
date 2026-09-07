@@ -137,10 +137,21 @@
                             <a href="{{ url('Admin/Doctors') }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left"></i> Back to doctors
                             </a>
-                            <a href="{{ url('Admin/Doctor/DeleteThis', $user->id) }}" class="btn btn-outline-danger"
-                                onclick="return confirm('Delete the account of {{ $user->name }} and all related data permanently?')">
-                                <i class="bi bi-trash"></i> Delete account
-                            </a>
+                            {{-- Accounts are deactivated, never deleted: a hard delete would
+                                 cascade away assignments, schedules and slots, and detach the
+                                 doctor from past appointments. --}}
+                            <form method="POST" action="{{ url('Admin/User/ToggleAccountStatus', $user->id) }}"
+                                onsubmit="return confirm('{{ $user->account_status === 'Active' ? 'Deactivate' : 'Reactivate' }} the account of {{ $user->name }}?')">
+                                @csrf
+                                <button
+                                    class="btn w-100 {{ $user->account_status === 'Active' ? 'btn-outline-danger' : 'btn-outline-success' }}">
+                                    <i class="bi {{ $user->account_status === 'Active' ? 'bi-lock' : 'bi-unlock' }}"></i>
+                                    {{ $user->account_status === 'Active' ? 'Deactivate account' : 'Reactivate account' }}
+                                </button>
+                            </form>
+                            <small class="text-muted">
+                                A deactivated account cannot sign in, but all of its records are kept.
+                            </small>
                         </div>
                     </div>
                 </div>

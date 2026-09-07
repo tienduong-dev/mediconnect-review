@@ -54,25 +54,39 @@ class AdminController extends Controller
         return view('admin.AdminPatients', compact('patients'));
     }
 
-    /**
-     * Do not hard-delete an account that still has live appointments, because
-     * appointments.patient_user_id is ON DELETE SET NULL, which would lose the patient trail.
-     */
-    public function deleteThisPatient($id)
-    {
-        $hasLiveAppointment = DB::table('appointments')
-            ->where('patient_user_id', $id)
-            ->whereIn('status', ['Pending', 'Confirmed'])
-            ->exists();
+    // ============= Account Control =============
 
-        if ($hasLiveAppointment) {
-            return redirect('Admin/Patients')
-                ->with('error', 'Cannot delete: this patient still has pending or confirmed appointments.');
+    /**
+     * Accounts are never hard-deleted, they are deactivated.
+     *
+     * Deleting a user row cascades through doctors -> doctor_assignments ->
+     * schedules and slots, and nulls the doctor and patient references on
+     * appointments, appointment_histories, medical_contents and
+     * contact_messages. For a clinic system that means losing the record of
+     * who treated whom, so account_status is used instead: the account stays
+     * intact and AuthController refuses the login.
+     */
+    public function toggleAccountStatus(Request $req, $id)
+    {
+        $user = User::findOrFail($id);
+
+        // An admin must not be able to lock themselves out
+        if ((int) $user->id === (int) auth()->id()) {
+            return back()->with('error', 'You cannot deactivate your own account.');
         }
 
-        User::where('id', $id)->delete();
+        $user->account_status = $user->account_status === 'Active' ? 'Inactive' : 'Active';
+        $user->save();
 
-        return redirect('Admin/Patients')->with('success', 'Patient account deleted.');
+        if ($user->account_status === 'Inactive') {
+            // Drop any open session so the user is signed out immediately
+            // (only has an effect when SESSION_DRIVER=database).
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
+
+        $state = $user->account_status === 'Active' ? 'reactivated' : 'deactivated';
+
+        return back()->with('success', 'Account of ' . $user->name . ' has been ' . $state . '.');
     }
 
     // ============= Doctor Control =============
@@ -155,28 +169,6 @@ class AdminController extends Controller
         $doctor->save();
 
         return redirect('Admin/Doctors')->with('success', 'Status updated for doctor ' . $req->name . '.');
-    }
-
-    public function deleteThisDoctor($id)
-    {
-        $doctor = Doctor::where('user_id', $id)->first();
-
-        if ($doctor) {
-            $hasLiveAppointment = DB::table('appointments')
-                ->join('doctor_assignments', 'appointments.doctor_assignment_id', '=', 'doctor_assignments.id')
-                ->where('doctor_assignments.doctor_id', $doctor->id)
-                ->whereIn('appointments.status', ['Pending', 'Confirmed'])
-                ->exists();
-
-            if ($hasLiveAppointment) {
-                return redirect('Admin/Doctors')
-                    ->with('error', 'Cannot delete: this doctor still has pending or confirmed appointments. Set the profile to Inactive instead.');
-            }
-        }
-
-        User::where('id', $id)->delete();
-
-        return redirect('Admin/Doctors')->with('success', 'Doctor account deleted.');
     }
 
     public function getAddDoctorDetailsFormData($id)

@@ -1,59 +1,65 @@
 @extends('admin/AdminLayout')
 
 @section('admin-content')
-    {{-- Patients --}}
     <section class="container">
+
+        @include('admin.partials.flash')
+
         <div class="card shadow">
             <div class="card-header bg-dark d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 text-white">Patients</h5>
-                <span class=" text-white">Total: {{ $patients->count() }}</span>
+                <span class="text-white small">Total on this page: {{ $patients->count() }}</span>
             </div>
+
             <div class="card-body table-responsive p-0">
                 <table class="table table-bordered align-middle m-0">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th style="width:1%">#</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Number</th>
-                            <th class="text-center" style="width: 1%;">Delete</th>
-                            {{-- <th class="text-center" style="width: 1%;">Activity</th> --}}
+                            <th>Address</th>
+                            <th class="text-center">Account status</th>
+                            <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($patients as $index => $p)
+                        @forelse ($patients as $index => $p)
                             <tr>
-                                <th>{{ $index + 1 }}</th>
-                                <td>{{ $p['name'] }}</td>
-                                <td>{{ $p['email'] }}</td>
-                                <td>{{ $p['number'] }}</td>
-
-                                <td class="text-center text-nowrap">
-                                    <a href="{{ url('Admin/Patient/DeleteThis', $p['id']) }}"
-                                        onclick="return confirm('Are you sure? You want to delete {{ $p['name'] }} account?')">
-                                        <i class="bi bi-trash"
-                                            style="color:#6c757d; display:contents; position:absolute; font-size:18px; font-weight:bold; cursor:pointer; transition:0.2s;"
-                                            onmouseover="this.style.color='red'; this.style.fontSize='22px'"
-                                            onmouseout="this.style.color='#6c757d'; this.style.fontSize='18px'">
-                                        </i>
-                                    </a>
+                                <th>{{ $patients->firstItem() + $index }}</th>
+                                <td>{{ $p->name }}</td>
+                                <td>{{ $p->email }}</td>
+                                <td>{{ $p->number }}</td>
+                                <td>{{ Str::limit($p->address, 40) ?: '—' }}</td>
+                                <td class="text-center">
+                                    <span class="badge {{ $p->account_status === 'Active' ? 'bg-success' : 'bg-secondary' }}">
+                                        {{ $p->account_status }}
+                                    </span>
                                 </td>
-
-                                {{-- <td class="text-center text-nowrap">
-                                    <a href="#">
-                                        <i class="bi bi-activity"
-                                            style="color:#6c757d; display:contents; position:absolute; font-size:18px; font-weight:bold; cursor:pointer; transition:0.2s;"
-                                            onmouseover="this.style.color='green'; this.style.fontSize='22px'"
-                                            onmouseout="this.style.color='#6c757d'; this.style.fontSize='18px'">
-                                        </i>
-                                    </a>
-                                </td> --}}
+                                <td class="text-center text-nowrap">
+                                    <form method="POST"
+                                        action="{{ url('Admin/User/ToggleAccountStatus', $p->id) }}" class="d-inline"
+                                        onsubmit="return confirm('{{ $p->account_status === 'Active' ? 'Deactivate' : 'Reactivate' }} the account of {{ $p->name }}?')">
+                                        @csrf
+                                        <button
+                                            class="btn btn-sm {{ $p->account_status === 'Active' ? 'btn-outline-danger' : 'btn-outline-success' }}">
+                                            <i class="bi {{ $p->account_status === 'Active' ? 'bi-lock' : 'bi-unlock' }}"></i>
+                                            {{ $p->account_status === 'Active' ? 'Deactivate' : 'Reactivate' }}
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">No patients yet.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer d-flex justify-content-between">
+
+            <div class="card-footer">
                 {{ $patients->links() }}
             </div>
         </div>

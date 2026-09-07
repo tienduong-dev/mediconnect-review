@@ -56,14 +56,13 @@ Route::middleware(['isAdmin'])->group(function () {
     // ================ Admin Router's ================
     // ------ Admin Patients Control Router's ------
     Route::get('Admin/Patients', [AdminController::class, 'patientList']);
-    Route::get('Admin/Patient/DeleteThis/{id}', [AdminController::class, 'deleteThisPatient']);
+    Route::post('Admin/User/ToggleAccountStatus/{id}', [AdminController::class, 'toggleAccountStatus']);
 
     // ------ Admin Doctor Control Router's ------
     Route::get('Admin/DoctorRegister', [AdminController::class, 'showDoctorRegisterForm']);
     Route::post('Admin/RegisterThisDoctorNow', [AdminController::class, 'registerDoctor']);
     Route::get('Admin/Doctors', [AdminController::class, 'doctorsList']);
     Route::get('Admin/DoctorProfile/{id}', [AdminController::class, 'getThisDoctorProfile']);
-    Route::get('Admin/Doctor/DeleteThis/{id}', [AdminController::class, 'deleteThisDoctor']);
     Route::get('Admin/AdminDoctorDetailsForm/{id}', [AdminController::class, 'getAddDoctorDetailsFormData']);
     Route::post('Admin/AddThisDoctorDetailsNow', [AdminController::class, 'saveDoctorDetails']);
     Route::get('Admin/Doctor/EditThisProfile/{id}', [AdminController::class, 'getAdminEditDoctorDetailsFormData']);
