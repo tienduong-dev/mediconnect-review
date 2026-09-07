@@ -137,6 +137,33 @@
                             <i class="bi bi-person-plus"></i> New Doctor Register
                         </a>
                     </li>
+                    {{-- ===== Master Data (du lieu nen cho luong dat lich) ===== --}}
+                    <li class="nav-item mt-3 mb-1">
+                        <span class="text-uppercase small fw-bold px-3" style="color:#8fa3bf; letter-spacing:1px;">
+                            Master Data
+                        </span>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="{{ url('Admin/Cities') }}" class="nav-link text-white">
+                            <i class="bi bi-geo-alt"></i> Cities
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="{{ url('Admin/Facilities') }}" class="nav-link text-white">
+                            <i class="bi bi-hospital"></i> Facilities
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="{{ url('Admin/Specializations') }}" class="nav-link text-white">
+                            <i class="bi bi-clipboard2-pulse"></i> Specializations
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="{{ url('Admin/FacilitySpecializations') }}" class="nav-link text-white">
+                            <i class="bi bi-diagram-3"></i> Facility Specializations
+                        </a>
+                    </li>
+
                     <li class="nav-item mt-4">
                         <a href="{{ url('logout') }}" class="nav-link text-danger">
                             <i class="bi bi-box-arrow-right"></i> Logout

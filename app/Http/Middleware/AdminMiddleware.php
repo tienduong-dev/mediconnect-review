@@ -16,11 +16,23 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(Auth::user() && Auth::user()->user_type == "Admin"){
-            return $next($request);
-        } else {
+        $user = Auth::user();
+
+        // Chua dang nhap hoac khong phai Admin
+        if (!$user || $user->user_type !== 'Admin') {
             Auth::logout();
             return redirect('login')->with('msg', 'Admin login required');
         }
+
+        // Tai khoan bi khoa boi Admin khac
+        if ($user->account_status !== 'Active') {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect('login')->with('msg', 'Tai khoan cua ban dang bi khoa. Vui long lien he quan tri vien.');
+        }
+
+        return $next($request);
     }
 }
