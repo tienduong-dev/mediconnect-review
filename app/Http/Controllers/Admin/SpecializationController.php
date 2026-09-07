@@ -41,7 +41,7 @@ class SpecializationController extends Controller
 
         Specialization::create($data);
 
-        return redirect('Admin/Specializations')->with('success', 'Da them chuyen khoa moi.');
+        return redirect('Admin/Specializations')->with('success', 'Specialization created successfully.');
     }
 
     public function edit($id)
@@ -56,30 +56,30 @@ class SpecializationController extends Controller
         $specialization = Specialization::findOrFail($id);
         $data = $this->validated($req, $specialization->id);
 
-        // Chi sinh lai slug khi ten thay doi
+        // Only regenerate the slug when the name changes
         if ($data['name'] !== $specialization->name) {
             $data['slug'] = $this->uniqueSlug($data['name'], $specialization->id);
         }
 
         $specialization->update($data);
 
-        return redirect('Admin/Specializations')->with('success', 'Da cap nhat chuyen khoa.');
+        return redirect('Admin/Specializations')->with('success', 'Specialization updated successfully.');
     }
 
     /**
-     * facility_specializations.specialization_id dung ON DELETE RESTRICT.
+     * facility_specializations.specialization_id uses ON DELETE RESTRICT.
      */
     public function destroy($id)
     {
         $specialization = Specialization::findOrFail($id);
 
         if ($specialization->facilitySpecializations()->exists()) {
-            return back()->with('error', 'Khong the xoa: chuyen khoa nay dang duoc gan cho co so y te. Hay chuyen sang Inactive.');
+            return back()->with('error', 'Cannot delete: this specialization is still assigned to a facility. Set it to Inactive instead.');
         }
 
         $specialization->delete();
 
-        return redirect('Admin/Specializations')->with('success', 'Da xoa chuyen khoa.');
+        return redirect('Admin/Specializations')->with('success', 'Specialization deleted successfully.');
     }
 
     public function toggleStatus($id)
@@ -88,7 +88,7 @@ class SpecializationController extends Controller
         $specialization->status = $specialization->status === 'Active' ? 'Inactive' : 'Active';
         $specialization->save();
 
-        return back()->with('success', 'Da doi trang thai chuyen khoa "' . $specialization->name . '".');
+        return back()->with('success', 'Status updated for specialization "' . $specialization->name . '".');
     }
 
     private function validated(Request $req, $ignoreId = null): array
@@ -98,8 +98,8 @@ class SpecializationController extends Controller
             'description' => ['nullable', 'string', 'max:2000'],
             'status'      => ['required', Rule::in(['Active', 'Inactive'])],
         ], [
-            'name.required' => 'Ten chuyen khoa khong duoc de trong.',
-            'name.unique'   => 'Chuyen khoa nay da ton tai.',
+            'name.required' => 'Specialization name is required.',
+            'name.unique'   => 'This specialization already exists.',
         ]);
     }
 

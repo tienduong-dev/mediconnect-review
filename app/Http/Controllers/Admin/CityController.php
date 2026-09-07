@@ -35,7 +35,7 @@ class CityController extends Controller
     {
         City::create($this->validated($req));
 
-        return redirect('Admin/Cities')->with('success', 'Da them thanh pho moi.');
+        return redirect('Admin/Cities')->with('success', 'City created successfully.');
     }
 
     public function edit($id)
@@ -50,24 +50,24 @@ class CityController extends Controller
         $city = City::findOrFail($id);
         $city->update($this->validated($req, $city->id));
 
-        return redirect('Admin/Cities')->with('success', 'Da cap nhat thanh pho.');
+        return redirect('Admin/Cities')->with('success', 'City updated successfully.');
     }
 
     /**
-     * facilities.city_id dung ON DELETE RESTRICT nen khong the xoa
-     * thanh pho dang co co so y te. Truong hop do nen chuyen sang Inactive.
+     * facilities.city_id uses ON DELETE RESTRICT, so a city that still has
+     * facilities cannot be deleted. Mark it Inactive instead.
      */
     public function destroy($id)
     {
         $city = City::findOrFail($id);
 
         if ($city->facilities()->exists()) {
-            return back()->with('error', 'Khong the xoa: thanh pho nay dang co co so y te. Hay chuyen sang Inactive.');
+            return back()->with('error', 'Cannot delete: this city still has facilities. Set it to Inactive instead.');
         }
 
         $city->delete();
 
-        return redirect('Admin/Cities')->with('success', 'Da xoa thanh pho.');
+        return redirect('Admin/Cities')->with('success', 'City deleted successfully.');
     }
 
     public function toggleStatus($id)
@@ -76,7 +76,7 @@ class CityController extends Controller
         $city->status = $city->status === 'Active' ? 'Inactive' : 'Active';
         $city->save();
 
-        return back()->with('success', 'Da doi trang thai thanh pho "' . $city->name . '".');
+        return back()->with('success', 'Status updated for city "' . $city->name . '".');
     }
 
     private function validated(Request $req, $ignoreId = null): array
@@ -94,9 +94,9 @@ class CityController extends Controller
             'country' => ['required', 'string', 'max:120'],
             'status'  => ['required', Rule::in(['Active', 'Inactive'])],
         ], [
-            'name.required'    => 'Ten thanh pho khong duoc de trong.',
-            'name.unique'      => 'Thanh pho nay da ton tai.',
-            'country.required' => 'Quoc gia khong duoc de trong.',
+            'name.required'    => 'City name is required.',
+            'name.unique'      => 'This city already exists.',
+            'country.required' => 'Country is required.',
         ]);
     }
 }

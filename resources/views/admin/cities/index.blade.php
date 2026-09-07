@@ -7,9 +7,9 @@
 
         <div class="card shadow">
             <div class="card-header bg-dark d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 text-white">Thành phố</h5>
+                <h5 class="mb-0 text-white">City</h5>
                 <a href="{{ url('Admin/Cities/Create') }}" class="btn btn-sm btn-light">
-                    <i class="bi bi-plus-lg"></i> Thêm thành phố
+                    <i class="bi bi-plus-lg"></i> Add City
                 </a>
             </div>
 
@@ -17,18 +17,18 @@
                 <form method="GET" action="{{ url('Admin/Cities') }}" class="row g-2">
                     <div class="col-md-5">
                         <input type="text" name="keyword" value="{{ request('keyword') }}" class="form-control"
-                            placeholder="Tìm theo tên thành phố...">
+                            placeholder="Search by city name...">
                     </div>
                     <div class="col-md-3">
                         <select name="status" class="form-select">
-                            <option value="">-- Tất cả trạng thái --</option>
+                            <option value="">-- All statuses --</option>
                             <option value="Active" @selected(request('status') === 'Active')>Active</option>
                             <option value="Inactive" @selected(request('status') === 'Inactive')>Inactive</option>
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-primary"><i class="bi bi-search"></i> Lọc</button>
-                        <a href="{{ url('Admin/Cities') }}" class="btn btn-outline-secondary">Xoá lọc</a>
+                        <button class="btn btn-primary"><i class="bi bi-search"></i> Filter</button>
+                        <a href="{{ url('Admin/Cities') }}" class="btn btn-outline-secondary">Reset</a>
                     </div>
                 </form>
             </div>
@@ -38,12 +38,12 @@
                     <thead>
                         <tr>
                             <th style="width:1%">#</th>
-                            <th>Tên thành phố</th>
-                            <th>Tỉnh / Bang</th>
-                            <th>Quốc gia</th>
-                            <th class="text-center">Số cơ sở</th>
-                            <th class="text-center">Trạng thái</th>
-                            <th class="text-center text-nowrap" style="width:1%">Thao tác</th>
+                            <th>City name</th>
+                            <th>State</th>
+                            <th>Country</th>
+                            <th class="text-center">Facilities</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,26 +58,26 @@
                                     <form method="POST" action="{{ url('Admin/Cities/ToggleStatus', $city->id) }}"
                                         class="d-inline">
                                         @csrf
-                                        <button class="btn btn-sm {{ $city->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
-                                            title="Bấm để đổi trạng thái">
+                                        <button class="btn btn-sm status-pill {{ $city->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
+                                            title="Click to toggle status">
                                             {{ $city->status }}
                                         </button>
                                     </form>
                                 </td>
                                 <td class="text-center text-nowrap">
                                     <a href="{{ url('Admin/Cities/Edit', $city->id) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
+                                        <i class="bi bi-pencil"></i> Edit
                                     </a>
                                     <form method="POST" action="{{ url('Admin/Cities/Delete', $city->id) }}" class="d-inline"
-                                        onsubmit="return confirm('Bạn chắc chắn muốn xoá thành phố {{ $city->name }}?')">
+                                        onsubmit="return confirm('Delete city {{ $city->name }}?')">
                                         @csrf
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">Chưa có thành phố nào.</td>
+                                <td colspan="7" class="text-center text-muted py-4">No cities yet.</td>
                             </tr>
                         @endforelse
                     </tbody>

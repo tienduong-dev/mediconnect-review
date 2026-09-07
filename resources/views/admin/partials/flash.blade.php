@@ -16,7 +16,7 @@
 
 @if ($errors->any())
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong><i class="bi bi-exclamation-circle"></i> Vui lòng kiểm tra lại:</strong>
+        <strong><i class="bi bi-exclamation-circle"></i> Please check the following:</strong>
         <ul class="mb-0 mt-2">
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>

@@ -5,18 +5,17 @@
 
         @include('admin.partials.flash')
 
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i>
-            Bảng này quyết định luồng tìm bác sĩ của bệnh nhân:
-            <strong>Thành phố → Cơ sở → Chuyên khoa → Bác sĩ</strong>.
-            Nếu một cơ sở chưa được gán chuyên khoa thì bệnh nhân sẽ không tìm thấy bác sĩ ở đó.
+        <div class="helper-note">
+                        This mapping drives the patient search flow:
+            <strong>City &rarr; Facility &rarr; Specialization &rarr; Doctor</strong>.
+            A facility with no specialization assigned will return no doctors for patients.
         </div>
 
         <div class="card shadow">
             <div class="card-header bg-dark d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 text-white">Chuyên khoa tại cơ sở</h5>
+                <h5 class="mb-0 text-white">Facility Specializations</h5>
                 <a href="{{ url('Admin/FacilitySpecializations/Create') }}" class="btn btn-sm btn-light">
-                    <i class="bi bi-plus-lg"></i> Gán chuyên khoa
+                    <i class="bi bi-plus-lg"></i> Assign Specialization
                 </a>
             </div>
 
@@ -24,7 +23,7 @@
                 <form method="GET" action="{{ url('Admin/FacilitySpecializations') }}" class="row g-2">
                     <div class="col-md-4">
                         <select name="facility_id" class="form-select">
-                            <option value="">-- Tất cả cơ sở --</option>
+                            <option value="">-- All facilities --</option>
                             @foreach ($facilities as $f)
                                 <option value="{{ $f->id }}" @selected(request('facility_id') == $f->id)>{{ $f->name }}</option>
                             @endforeach
@@ -32,7 +31,7 @@
                     </div>
                     <div class="col-md-3">
                         <select name="specialization_id" class="form-select">
-                            <option value="">-- Tất cả chuyên khoa --</option>
+                            <option value="">-- All specializations --</option>
                             @foreach ($specializations as $sp)
                                 <option value="{{ $sp->id }}" @selected(request('specialization_id') == $sp->id)>{{ $sp->name }}</option>
                             @endforeach
@@ -40,14 +39,14 @@
                     </div>
                     <div class="col-md-2">
                         <select name="status" class="form-select">
-                            <option value="">-- Trạng thái --</option>
+                            <option value="">-- Status --</option>
                             <option value="Active" @selected(request('status') === 'Active')>Active</option>
                             <option value="Inactive" @selected(request('status') === 'Inactive')>Inactive</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <button class="btn btn-primary"><i class="bi bi-search"></i> Lọc</button>
-                        <a href="{{ url('Admin/FacilitySpecializations') }}" class="btn btn-outline-secondary">Xoá lọc</a>
+                        <button class="btn btn-primary"><i class="bi bi-search"></i> Filter</button>
+                        <a href="{{ url('Admin/FacilitySpecializations') }}" class="btn btn-outline-secondary">Reset</a>
                     </div>
                 </form>
             </div>
@@ -57,12 +56,12 @@
                     <thead>
                         <tr>
                             <th style="width:1%">#</th>
-                            <th>Cơ sở</th>
-                            <th>Thành phố</th>
-                            <th>Chuyên khoa</th>
-                            <th class="text-center">Số bác sĩ</th>
-                            <th class="text-center">Trạng thái</th>
-                            <th class="text-center text-nowrap" style="width:1%">Thao tác</th>
+                            <th>Facility</th>
+                            <th>City</th>
+                            <th>Specialization</th>
+                            <th class="text-center">Doctors</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -79,8 +78,8 @@
                                         class="d-inline">
                                         @csrf
                                         <button
-                                            class="btn btn-sm {{ $item->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
-                                            title="Bấm để đổi trạng thái">
+                                            class="btn btn-sm status-pill {{ $item->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
+                                            title="Click to toggle status">
                                             {{ $item->status }}
                                         </button>
                                     </form>
@@ -88,19 +87,19 @@
                                 <td class="text-center text-nowrap">
                                     <a href="{{ url('Admin/FacilitySpecializations/Edit', $item->id) }}"
                                         class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
+                                        <i class="bi bi-pencil"></i> Edit
                                     </a>
                                     <form method="POST"
                                         action="{{ url('Admin/FacilitySpecializations/Delete', $item->id) }}"
-                                        class="d-inline" onsubmit="return confirm('Bạn chắc chắn muốn gỡ chuyên khoa này khỏi cơ sở?')">
+                                        class="d-inline" onsubmit="return confirm('Remove this specialization from the facility?')">
                                         @csrf
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">Chưa có phân công chuyên khoa nào.</td>
+                                <td colspan="7" class="text-center text-muted py-4">No facility specializations yet.</td>
                             </tr>
                         @endforelse
                     </tbody>

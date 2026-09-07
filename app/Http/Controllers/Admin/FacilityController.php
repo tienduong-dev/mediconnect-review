@@ -47,7 +47,7 @@ class FacilityController extends Controller
     {
         Facility::create($this->validated($req));
 
-        return redirect('Admin/Facilities')->with('success', 'Da them co so y te moi.');
+        return redirect('Admin/Facilities')->with('success', 'Facility created successfully.');
     }
 
     public function edit($id)
@@ -63,13 +63,13 @@ class FacilityController extends Controller
         $facility = Facility::findOrFail($id);
         $facility->update($this->validated($req, $facility->id));
 
-        return redirect('Admin/Facilities')->with('success', 'Da cap nhat co so y te.');
+        return redirect('Admin/Facilities')->with('success', 'Facility updated successfully.');
     }
 
     /**
-     * facility_specializations se bi CASCADE khi xoa facility, nhung
-     * doctor_assignments.facility_specialization_id lai la RESTRICT
-     * => chan lai neu con bac si dang duoc phan cong o day.
+     * facility_specializations cascade when a facility is deleted, but
+     * doctor_assignments.facility_specialization_id is RESTRICT,
+     * so block deletion while doctors are still assigned here.
      */
     public function destroy($id)
     {
@@ -80,12 +80,12 @@ class FacilityController extends Controller
             ->exists();
 
         if ($hasAssignment) {
-            return back()->with('error', 'Khong the xoa: con bac si dang duoc phan cong tai co so nay. Hay chuyen sang Inactive.');
+            return back()->with('error', 'Cannot delete: doctors are still assigned to this facility. Set it to Inactive instead.');
         }
 
         $facility->delete();
 
-        return redirect('Admin/Facilities')->with('success', 'Da xoa co so y te.');
+        return redirect('Admin/Facilities')->with('success', 'Facility deleted successfully.');
     }
 
     public function toggleStatus($id)
@@ -94,7 +94,7 @@ class FacilityController extends Controller
         $facility->status = $facility->status === 'Active' ? 'Inactive' : 'Active';
         $facility->save();
 
-        return back()->with('success', 'Da doi trang thai co so "' . $facility->name . '".');
+        return back()->with('success', 'Status updated for facility "' . $facility->name . '".');
     }
 
     private function validated(Request $req, $ignoreId = null): array
@@ -114,13 +114,13 @@ class FacilityController extends Controller
             'description' => ['nullable', 'string', 'max:2000'],
             'status'      => ['required', Rule::in(['Active', 'Inactive'])],
         ], [
-            'city_id.required' => 'Vui long chon thanh pho.',
-            'name.required'    => 'Ten co so khong duoc de trong.',
-            'name.unique'      => 'Thanh pho nay da co co so cung ten.',
-            'code.required'    => 'Ma co so khong duoc de trong.',
-            'code.unique'      => 'Ma co so nay da duoc su dung.',
-            'address.required' => 'Dia chi khong duoc de trong.',
-            'phone.required'   => 'So dien thoai khong duoc de trong.',
+            'city_id.required' => 'Please select a city.',
+            'name.required'    => 'Facility name is required.',
+            'name.unique'      => 'This city already has a facility with the same name.',
+            'code.required'    => 'Facility code is required.',
+            'code.unique'      => 'This facility code is already in use.',
+            'address.required' => 'Address is required.',
+            'phone.required'   => 'Phone number is required.',
         ]);
     }
 }

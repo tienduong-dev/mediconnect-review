@@ -9,7 +9,7 @@
 
         <div class="card shadow">
             <div class="card-header bg-dark">
-                <h5 class="mb-0 text-white">{{ $isEdit ? 'Sửa thành phố' : 'Thêm thành phố mới' }}</h5>
+                <h5 class="mb-0 text-white">{{ $isEdit ? 'Edit City' : 'Add New City' }}</h5>
             </div>
 
             <form method="POST"
@@ -18,25 +18,25 @@
 
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">Tên thành phố <span class="text-danger">*</span></label>
+                        <label class="form-label">City name <span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control" value="{{ old('name', $city->name) }}"
-                            placeholder="VD: Hanoi" required>
+                            placeholder="e.g. Hanoi" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Tỉnh / Bang</label>
+                        <label class="form-label">State</label>
                         <input type="text" name="state" class="form-control" value="{{ old('state', $city->state) }}"
-                            placeholder="Có thể để trống">
+                            placeholder="Optional">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Quốc gia <span class="text-danger">*</span></label>
+                        <label class="form-label">Country <span class="text-danger">*</span></label>
                         <input type="text" name="country" class="form-control"
                             value="{{ old('country', $city->country ?? 'Vietnam') }}" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                        <label class="form-label">Status <span class="text-danger">*</span></label>
                         <select name="status" class="form-select" required>
                             <option value="Active" @selected(old('status', $city->status) === 'Active')>Active</option>
                             <option value="Inactive" @selected(old('status', $city->status) === 'Inactive')>Inactive</option>
@@ -46,9 +46,9 @@
 
                 <div class="card-footer d-flex gap-2">
                     <button class="btn btn-primary">
-                        <i class="bi bi-save"></i> {{ $isEdit ? 'Lưu thay đổi' : 'Thêm mới' }}
+                        <i class="bi bi-save"></i> {{ $isEdit ? 'Save changes' : 'Create' }}
                     </button>
-                    <a href="{{ url('Admin/Cities') }}" class="btn btn-outline-secondary">Huỷ</a>
+                    <a href="{{ url('Admin/Cities') }}" class="btn btn-outline-secondary">Cancel</a>
                 </div>
             </form>
         </div>

@@ -10,8 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 /**
- * Quan ly viec mot co so y te cung cap nhung chuyen khoa nao.
- * Day la bang ban le quyet dinh luong tim bac si cua Patient:
+ * Manages which specializations each facility provides.
+ * This pivot table drives the patient search flow:
  * City -> Facility -> Specialization -> Doctor.
  */
 class FacilitySpecializationController extends Controller
@@ -55,7 +55,7 @@ class FacilitySpecializationController extends Controller
     {
         FacilitySpecialization::create($this->validated($req));
 
-        return redirect('Admin/FacilitySpecializations')->with('success', 'Da gan chuyen khoa cho co so.');
+        return redirect('Admin/FacilitySpecializations')->with('success', 'Specialization assigned to the facility.');
     }
 
     public function edit($id)
@@ -72,23 +72,23 @@ class FacilitySpecializationController extends Controller
         $item = FacilitySpecialization::findOrFail($id);
         $item->update($this->validated($req, $item->id));
 
-        return redirect('Admin/FacilitySpecializations')->with('success', 'Da cap nhat phan cong chuyen khoa.');
+        return redirect('Admin/FacilitySpecializations')->with('success', 'Facility specialization updated.');
     }
 
     /**
-     * doctor_assignments.facility_specialization_id dung ON DELETE RESTRICT.
+     * doctor_assignments.facility_specialization_id uses ON DELETE RESTRICT.
      */
     public function destroy($id)
     {
         $item = FacilitySpecialization::findOrFail($id);
 
         if ($item->doctorAssignments()->exists()) {
-            return back()->with('error', 'Khong the xoa: con bac si dang duoc phan cong vao chuyen khoa nay tai co so. Hay chuyen sang Inactive.');
+            return back()->with('error', 'Cannot delete: doctors are still assigned to this specialization at this facility. Set it to Inactive instead.');
         }
 
         $item->delete();
 
-        return redirect('Admin/FacilitySpecializations')->with('success', 'Da go chuyen khoa khoi co so.');
+        return redirect('Admin/FacilitySpecializations')->with('success', 'Specialization removed from the facility.');
     }
 
     public function toggleStatus($id)
@@ -97,7 +97,7 @@ class FacilitySpecializationController extends Controller
         $item->status = $item->status === 'Active' ? 'Inactive' : 'Active';
         $item->save();
 
-        return back()->with('success', 'Da doi trang thai phan cong chuyen khoa.');
+        return back()->with('success', 'Facility specialization status updated.');
     }
 
     private function validated(Request $req, $ignoreId = null): array
@@ -113,9 +113,9 @@ class FacilitySpecializationController extends Controller
             ],
             'status' => ['required', Rule::in(['Active', 'Inactive'])],
         ], [
-            'facility_id.required'         => 'Vui long chon co so y te.',
-            'specialization_id.required'   => 'Vui long chon chuyen khoa.',
-            'specialization_id.unique'     => 'Co so nay da co chuyen khoa do roi.',
+            'facility_id.required'         => 'Please select a facility.',
+            'specialization_id.required'   => 'Please select a specialization.',
+            'specialization_id.unique'     => 'This facility already has that specialization.',
         ]);
     }
 }

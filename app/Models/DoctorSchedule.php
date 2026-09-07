@@ -9,8 +9,8 @@ class DoctorSchedule extends Model
     protected $table = 'doctor_schedules';
 
     /**
-     * Theo schema MediConnect moi: lich lam viec gan voi doctor_assignments
-     * (bac si lam tai co so + chuyen khoa nao), khong gan truc tiep voi doctors.
+     * In the MediConnect schema a schedule belongs to a doctor_assignment
+     * (doctor at a given facility and specialization), not directly to a doctor.
      */
     protected $fillable = [
         'doctor_assignment_id',
