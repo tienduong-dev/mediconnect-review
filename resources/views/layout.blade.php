@@ -3,9 +3,9 @@
 <!--<< Header Area >>-->
 
 
-<!-- Mirrored from etorisoft.com/html/medizen/{{ url('index') }} by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 11 Sep 2025 03:58:23 GMT -->
+<!-- Mirrored from etorisoft.com/html/mediconnect/{{ url('index') }} by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 11 Sep 2025 03:58:23 GMT -->
 
-<!-- Mirrored from thememxpro.com/demo/medizen/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 17 Feb 2026 14:09:51 GMT -->
+<!-- Mirrored from thememxpro.com/demo/mediconnect/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 17 Feb 2026 14:09:51 GMT -->
 <!-- Added by HTTrack -->
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
 
@@ -15,9 +15,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="authorName">
-    <meta name="description" content="MediZen - Health & Medical HTML Template">
+    <meta name="description" content="MediConnect - Health & Medical HTML Template">
     <!-- ======== Page title ============ -->
-    <title>Medizen</title>
+    <title>MediConnect</title>
 
     <!--<< Favcion >>-->
     <link rel="shortcut icon" href="{{ asset('assets/img/logo/favs.png') }}">
@@ -79,21 +79,37 @@
                 <span data-text-preloader="M" class="letters-loading">
                     M
                 </span>
+                <span data-text-preloader="E" class="letters-loading">
+                    E
+                </span>
                 <span data-text-preloader="D" class="letters-loading">
                     D
                 </span>
                 <span data-text-preloader="I" class="letters-loading">
                     I
                 </span>
-                <span data-text-preloader="Z" class="letters-loading">
-                    Z
+                <span data-text-preloader="C" class="letters-loading">
+                    C
                 </span>
-                <span data-text-preloader="E" class="letters-loading">
-                    E
+                <span data-text-preloader="O" class="letters-loading">
+                    O
                 </span>
                 <span data-text-preloader="N" class="letters-loading">
                     N
                 </span>
+                <span data-text-preloader="N" class="letters-loading">
+                    N
+                </span>
+                <span data-text-preloader="E" class="letters-loading">
+                    E
+                </span>
+                <span data-text-preloader="C" class="letters-loading">
+                    C
+                </span>
+                <span data-text-preloader="T" class="letters-loading">
+                    T
+                </span>
+
             </div>
             <p class="text-center">Loading</p>
         </div>
@@ -221,7 +237,7 @@
         <div class="footer-bottom text-center">
             <div class="container">
                 <p class="body-font text-center py-4">
-                    &copy; 2025 MediZen | All Rights Reserved
+                    &copy; 2026 MediConnect | All Rights Reserved
                 </p>
             </div>
         </div>
@@ -391,6 +407,6 @@
 </body>
 
 
-<!-- Mirrored from thememxpro.com/demo/medizen/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 17 Feb 2026 14:10:12 GMT -->
+<!-- Mirrored from thememxpro.com/demo/mediconnect/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 17 Feb 2026 14:10:12 GMT -->
 
 </html>
