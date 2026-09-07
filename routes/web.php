@@ -17,6 +17,7 @@ use App\Http\Controllers\ContactController;
 
 // ------ Admin controllers (all live in App\Http\Controllers\Admin) ------
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\PatientController as AdminPatientController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\SpecializationController;
@@ -55,7 +56,14 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 Route::middleware(['isAdmin'])->group(function () {
     // ================ Admin Router's ================
     // ------ Admin Patients Control Router's ------
-    Route::get('Admin/Patients', [AdminController::class, 'patientList']);
+    Route::get('Admin/Patients', [AdminPatientController::class, 'index']);
+    Route::get('Admin/Patients/Create', [AdminPatientController::class, 'create']);
+    Route::post('Admin/Patients/Store', [AdminPatientController::class, 'store']);
+    Route::get('Admin/Patients/Show/{id}', [AdminPatientController::class, 'show']);
+    Route::get('Admin/Patients/Edit/{id}', [AdminPatientController::class, 'edit']);
+    Route::post('Admin/Patients/Update/{id}', [AdminPatientController::class, 'update']);
+
+    // Shared by doctor and patient accounts: deactivate / reactivate instead of delete
     Route::post('Admin/User/ToggleAccountStatus/{id}', [AdminController::class, 'toggleAccountStatus']);
 
     // ------ Admin Doctor Control Router's ------
