@@ -20,6 +20,34 @@
                 </a>
             </div>
 
+            <div class="card-body border-bottom">
+                <form method="GET" action="{{ url('Admin/Doctors') }}" class="row g-2">
+                    <div class="col-md-4">
+                        <input type="text" name="keyword" value="{{ request('keyword') }}" class="form-control"
+                            placeholder="Search by name, email or phone...">
+                    </div>
+                    <div class="col-md-2">
+                        <select name="account_status" class="form-select">
+                            <option value="">-- Account --</option>
+                            <option value="Active" @selected(request('account_status') === 'Active')>Active</option>
+                            <option value="Inactive" @selected(request('account_status') === 'Inactive')>Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="profile" class="form-select">
+                            <option value="">-- Profile --</option>
+                            <option value="Active" @selected(request('profile') === 'Active')>Profile active</option>
+                            <option value="Inactive" @selected(request('profile') === 'Inactive')>Profile inactive</option>
+                            <option value="missing" @selected(request('profile') === 'missing')>No profile yet</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary"><i class="bi bi-search"></i> Filter</button>
+                        <a href="{{ url('Admin/Doctors') }}" class="btn btn-outline-secondary">Reset</a>
+                    </div>
+                </form>
+            </div>
+
             <div class="card-body table-responsive p-0">
                 <table class="table table-bordered align-middle m-0">
                     <thead>
