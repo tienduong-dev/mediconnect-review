@@ -3,24 +3,20 @@
 <!--<< Header Area >>-->
 
 
-<!-- Mirrored from etorisoft.com/html/medizen/{{ url('Admin/AdminDashboard') }} by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 11 Sep 2025 03:58:23 GMT -->
-
-<!-- Mirrored from thememxpro.com/demo/medizen/Admin/AdminDashboard.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 17 Feb 2026 14:09:51 GMT -->
-<!-- Added by HTTrack -->
-<meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 
 <head>
     <!-- ========== Meta Tags ========== -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="author" content="authorName">
-    <meta name="description" content="MediZen - Health & Medical HTML Template">
+    <meta name="author" content="MediConnect">
+    <meta name="description" content="MediConnect - Doctor Appointment System, administration area">
     <!-- ======== Page title ============ -->
-    <title>Admin || Medizen </title>
+    <title>@yield('page-title', 'Dashboard') || MediConnect Admin</title>
 
-    <!--<< Favcion >>-->
-    <link rel="shortcut icon" href="{{ asset('assets/img/logo/favs.png') }}">
+    <!--<< Favicon >>-->
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/logo/mediconnect-fav.png') }}">
     <!--<< Bootstrap min.css >>-->
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
 
@@ -263,7 +259,8 @@
 
             <div class="p-3 text-center">
                 <a href="{{ url('Admin/AdminDashboard') }}">
-                    <img src="{{ asset('assets/img/logo/logo-white.png') }}" style="max-width:140px;">
+                    <img src="{{ asset('assets/img/logo/mediconnect-white.png') }}" alt="MediConnect"
+                        style="max-width:215px; width:100%;">
                 </a>
             </div>
 
@@ -382,7 +379,8 @@
                             <div class="single-footer-widget wow fadeInUp" data-wow-delay="0.4s">
                                 <div class="widget-head">
                                     <a href="{{ url('index') }}">
-                                        <img src="{{ asset('assets/img/logo/logo-white.png') }}" alt="logo-img">
+                                        <img src="{{ asset('assets/img/logo/mediconnect-white.png') }}"
+                                            alt="MediConnect" style="max-width:200px;">
                                     </a>
                                 </div>
                             </div>
@@ -410,7 +408,7 @@
         <div class="footer-bottom text-center">
             <div class="container">
                 <p class="body-font text-center py-4">
-                    &copy; 2025 MediZen | All Rights Reserved
+                    &copy; {{ date('Y') }} MediConnect | All Rights Reserved
                 </p>
             </div>
         </div>
@@ -426,7 +424,8 @@
                     <div class="offcanvas__top mb-4 d-flex justify-content-between align-items-center">
                         <div class="offcanvas__logo">
                             <a href="{{ url('Admin/AdminDashboard') }}">
-                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img">
+                                <img src="{{ asset('assets/img/logo/mediconnect.png') }}" alt="MediConnect"
+                                    style="max-width:170px;">
                             </a>
                         </div>
                         <div class="offcanvas__close">
@@ -535,7 +534,5 @@
 
 </body>
 
-
-<!-- Mirrored from thememxpro.com/demo/medizen/Admin/AdminDashboard.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 17 Feb 2026 14:10:12 GMT -->
 
 </html>
