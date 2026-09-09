@@ -174,9 +174,9 @@ Route::middleware(['isPatient'])->group(function () {
     Route::post('Patient/Appointment/UpdateStatus', [PatientController::class, 'appointmentCancel']);
     // Doctor Search
     Route::get(
-        '/doctors',
+    '/doctors',
         [DoctorSearchController::class, 'index']
-    );
+    )->name('patient.doctors.search');
 
     Route::get(
         '/doctors/facilities/{cityId}',

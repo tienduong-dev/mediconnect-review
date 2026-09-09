@@ -42,7 +42,7 @@
                             <h4 class="black mb-md-3 mb-2">Compassionate Care There Health First</h4>
                             <p class="black mb-40 pb-2">Health care is a vital aspect of maintaining overall well-being
                                 encompassing a range of services from preventive</p>
-                            <a href="{{ url('/FilterDoctors') }}"
+                            <a href="{{ route('patient.doctors.search') }}"
                                 class="common-btn box-style first-box d-inline-flex justify-content-center align-items-center gap-xxl-2 gap-2 fs18 fw-semibold black overflow-hidden rounded100">
                                 Book An Appointment
                                 <img src="{{ asset('assets/img/icon/arrow-right-black.png') }}" alt="icon">
