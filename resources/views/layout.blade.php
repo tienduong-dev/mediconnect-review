@@ -140,59 +140,71 @@
 
 
     <!-- Header Section Start -->
-    <header id="header-sticky" class="header-1 header-style2">
-        <div class="container">
-            <div class="mega-menu-wrapper">
-                <div class="header-main style-2">
-                    <div class="header-left">
-                        <div class="logo">
-                            <a href="{{ url('index') }}" class="header-logo">
-                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img" width="150px">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="header-right d-flex justify-content-end align-items-center">
-                        <div class="mean__menu-wrapper">
-                            <div class="main-menu">
-                                <nav id="mobile-menu">
-                                    <ul>
+    @if(auth()->check() && auth()->user()->user_type == 'Patient')
 
-                                        @if (auth()->user() && auth()->user()->user_type == 'Patient')
-                                            <li><a href="{{ url('Patient/PatientDashboard') }}">Home</a></li>
-                                        @else
-                                            <li><a href="{{ url('index') }}">Home</a></li>
-                                        @endif
-                                        <li><a href="{{ url('doctors') }}">Doctor</a></li>
-                                        <li><a href="{{ url('contact') }}">Contact</a></li>
-                                        <li><a href="{{ url('about') }}">About Us</a></li>
-                                        @if (auth()->user())
-                                            <li class="has-dropdown"><a href="{{ url('logout') }}"
-                                                    style="color:#f98c8c">Logout</a></li>
-                                        @else
-                                            <li class="has-dropdown"><a href="{{ url('login') }}">Login</a></li>
-                                            <li class="has-dropdown dark"><a href="{{ url('register') }}">Register</a>
-                                            </li>
-                                        @endif
-                                    </ul>
-                                </nav>
+        @include('components.patient-header')
+
+    @else
+
+        <header id="header-sticky" class="header-1 header-style2">
+            <div class="container">
+                <div class="mega-menu-wrapper">
+                    <div class="header-main style-2">
+                        <div class="header-left">
+                            <div class="logo">
+                                <a href="{{ url('index') }}" class="header-logo">
+                                    <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img" width="150px">
+                                </a>
                             </div>
                         </div>
-                        {{-- <a href="#0" class="search-trigger search-icon d-none d-xl-block"><i
-                                class="fal fa-search"></i></a> --}}
-                        @if (auth()->user())
-                            <a href="{{ url('Patient/MyProfile') }}" class="profile-icon"><i
-                                    class="fas fa-user"></i></a>
-                        @endif
-                        <div class="header__hamburger d-xl-none my-auto">
-                            <div class="sidebar__toggle">
-                                <img src="{{ asset('assets/img/icon/menu.png') }}" alt="icon">
+                        <div class="header-right d-flex justify-content-end align-items-center">
+                            <div class="mean__menu-wrapper">
+                                <div class="main-menu">
+                                    <nav id="mobile-menu">
+                                        <ul>
+
+                                            <li>
+                                                <a href="{{ url('index') }}">
+                                                    Home
+                                                </a>
+                                            </li>
+                                            <li><a href="{{ url('doctors') }}">Doctor</a></li>
+                                            <li><a href="{{ url('contact') }}">Contact</a></li>
+                                            <li><a href="{{ url('about') }}">About Us</a></li>
+                                            @if (auth()->user())
+                                                <li class="has-dropdown"><a href="{{ url('logout') }}"
+                                                        style="color:#f98c8c">Logout</a></li>
+                                            @else
+                                                <li class="has-dropdown"><a href="{{ url('login') }}">Login</a></li>
+                                                <li class="has-dropdown dark"><a href="{{ url('register') }}">Register</a>
+                                                </li>
+                                            @endif
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                            {{-- <a href="#0" class="search-trigger search-icon d-none d-xl-block"><i
+                                    class="fal fa-search"></i></a> --}}
+                            @if(auth()->check() && auth()->user()->user_type == 'Patient')
+
+                                <a href="{{ url('Patient/MyProfile') }}" class="profile-icon">
+                                    <i class="fas fa-user"></i>
+                                </a>
+
+                            @endif
+                            <div class="header__hamburger d-xl-none my-auto">
+                                <div class="sidebar__toggle">
+                                    <img src="{{ asset('assets/img/icon/menu.png') }}" alt="icon">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
+
+
+    @endif
 
     <hr style="margin: 0;">
 
