@@ -1,0 +1,14 @@
+# Uploaded files are served from this folder, so nothing in it may ever run
+# as code. The upload path already rejects anything that is not a real
+# image, and this is the second lock: even if a script did land here, the
+# web server refuses to execute or serve it.
+<FilesMatch "\.(?i:php|phar|phtml|php[0-9]|pl|py|cgi|sh|htaccess)$">
+    Require all denied
+</FilesMatch>
+
+# Never let the browser second-guess the type of a stored file.
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+Options -Indexes

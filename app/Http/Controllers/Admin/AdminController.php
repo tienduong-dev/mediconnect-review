@@ -3,17 +3,47 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\Concerns\LogsAdminActions;
 use App\Http\Controllers\Admin\Concerns\SortsListings;
 use App\Models\City;
 use App\Models\Doctor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
     use SortsListings;
+    use LogsAdminActions;
+
+    /**
+     * Extensions accepted for a doctor photo.
+     *
+     * Checked against the extension PHP guesses from the file contents,
+     * never against the name the browser sent. A file called "evil.php"
+     * that starts with a GIF header passes the "image" validation rule,
+     * and storing it under its original extension inside the web-served
+     * public/upload/doctors folder would make it executable.
+     */
+    private const PHOTO_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+
+    /** Random, collision-free, extension derived from the file contents. */
+    private function storeDoctorPhoto($file): string
+    {
+        $extension = strtolower((string) $file->extension());
+
+        if (!in_array($extension, self::PHOTO_EXTENSIONS, true)) {
+            abort(422, 'Unsupported image type.');
+        }
+
+        // time() alone collides when two photos are uploaded in the same second
+        $name = Str::uuid() . '.' . $extension;
+        $file->move(public_path('upload/doctors'), $name);
+
+        return $name;
+    }
 
     public function dashboard()
     {
@@ -104,6 +134,12 @@ class AdminController extends Controller
 
         $state = $user->account_status === 'Active' ? 'reactivated' : 'deactivated';
 
+        $this->logAdminAction('account.' . $state, [
+            'user_id'   => $user->id,
+            'user_type' => $user->user_type,
+            'email'     => $user->email,
+        ]);
+
         return back()->with('success', 'Account of ' . $user->name . ' has been ' . $state . '.');
     }
 
@@ -122,14 +158,15 @@ class AdminController extends Controller
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
             'number'   => ['required', 'digits:10'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'address'  => ['nullable', 'string', 'max:500'],
             'city_id'  => ['nullable', 'exists:cities,id'],
         ], [
             'name.required'     => 'Full name is required.',
             'email.unique'      => 'This email is already in use.',
             'number.digits'     => 'Phone number must be exactly 10 digits.',
-            'password.min'      => 'Password must be at least 8 characters.',
+            'password.min'       => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'The two passwords do not match.',
         ]);
 
         // user_type is always Doctor on this screen; never read it from the request
@@ -182,7 +219,10 @@ class AdminController extends Controller
 
     public function getThisDoctorProfile($id)
     {
-        $user = User::find($id);
+        // Guard the user type: without it, passing a patient id here leads
+        // straight to the "add professional profile" form and would attach
+        // a doctors row to a patient account.
+        $user = User::where('user_type', 'Doctor')->findOrFail($id);
 
         // Eager load assignments (facility + specialization + room + fee)
         $doctor = Doctor::with([
@@ -200,11 +240,11 @@ class AdminController extends Controller
 
     public function updateDoctorStatus(Request $req)
     {
-        $doctor = Doctor::find($req->id);
+        $validated = $req->validate([
+            'id' => ['required', 'integer', 'exists:doctors,id'],
+        ]);
 
-        if (!$doctor) {
-            return back()->with('error', 'Doctor profile not found.');
-        }
+        $doctor = Doctor::with('user:id,name')->findOrFail($validated['id']);
 
         $doctor->status = $doctor->status === 'Active' ? 'Inactive' : 'Active';
         $doctor->save();
@@ -213,13 +253,22 @@ class AdminController extends Controller
             ? 'is now visible in patient search'
             : 'is now hidden from patient search';
 
+        $this->logAdminAction('doctor.visibility.' . strtolower($doctor->status), [
+            'doctor_id' => $doctor->id,
+            'user_id'   => $doctor->user_id,
+        ]);
+
+        // The name is read from the database, not from the posted form, so a
+        // tampered field cannot inject text into the message shown to the admin.
+        $name = $doctor->user->name ?? 'This doctor';
+
         // Triggered from the doctor detail page, so stay on it
-        return back()->with('success', 'Dr. ' . $req->name . ' ' . $visibility . '.');
+        return back()->with('success', $name . ' ' . $visibility . '.');
     }
 
     public function getAddDoctorDetailsFormData($id)
     {
-        $doctor = User::findOrFail($id);
+        $doctor = User::where('user_type', 'Doctor')->findOrFail($id);
 
         return view('admin.AdminDoctorDetailsForm', compact('doctor'));
     }
@@ -233,7 +282,7 @@ class AdminController extends Controller
     {
         $validated = $req->validate([
             'user_id'        => ['required', 'exists:users,id'],
-            'image'          => ['required', 'image', 'max:4096'],
+            'image'          => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
             'expertise'      => ['required', 'string', 'max:255'],
             'experience'     => ['required', 'integer', 'min:0', 'max:80'],
             'education'      => ['required', 'string', 'max:255'],
@@ -254,9 +303,7 @@ class AdminController extends Controller
                 ->with('error', 'This doctor already has a professional profile.');
         }
 
-        $file = $req->file('image');
-        $name = time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('upload/doctors'), $name);
+        $name = $this->storeDoctorPhoto($req->file('image'));
 
         Doctor::create([
             'image'          => $name,
@@ -277,7 +324,7 @@ class AdminController extends Controller
 
     public function getAdminEditDoctorDetailsFormData($id)
     {
-        $user   = User::findOrFail($id);
+        $user   = User::where('user_type', 'Doctor')->findOrFail($id);
         $doctor = Doctor::where('user_id', $id)->first();
 
         if (!$doctor) {
@@ -301,7 +348,7 @@ class AdminController extends Controller
             'number'         => ['required', 'digits:10'],
             'address'        => ['nullable', 'string', 'max:500'],
             'city_id'        => ['nullable', 'exists:cities,id'],
-            'image'          => ['nullable', 'image', 'max:4096'],
+            'image'          => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
             'expertise'      => ['required', 'string', 'max:255'],
             'experience'     => ['required', 'integer', 'min:0', 'max:80'],
             'education'      => ['required', 'string', 'max:255'],
@@ -322,10 +369,7 @@ class AdminController extends Controller
 
         // Previous bug: the file was uploaded but the new filename was never stored
         if ($req->hasFile('image')) {
-            $file = $req->file('image');
-            $name = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('upload/doctors'), $name);
-            $doctor->image = $name;
+            $doctor->image = $this->storeDoctorPhoto($req->file('image'));
         }
 
         $doctor->expertise      = $validated['expertise'];

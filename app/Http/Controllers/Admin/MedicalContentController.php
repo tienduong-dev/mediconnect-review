@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\Concerns\LogsAdminActions;
 use App\Http\Controllers\Admin\Concerns\SortsListings;
 use App\Models\MedicalContent;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ use Illuminate\Validation\Rule;
 class MedicalContentController extends Controller
 {
     use SortsListings;
+    use LogsAdminActions;
 
     /** Mirrors the content_type ENUM in the medical_contents table. */
     public const TYPES = [
@@ -218,6 +220,13 @@ class MedicalContentController extends Controller
 
         $this->deleteImage($content->featured_image);
         $title = $content->title;
+
+        $this->logAdminAction('medical_content.deleted', [
+            'content_id' => $content->id,
+            'slug'       => $content->slug,
+            'title'      => $title,
+        ]);
+
         $content->delete();
 
         return redirect('Admin/MedicalContents')

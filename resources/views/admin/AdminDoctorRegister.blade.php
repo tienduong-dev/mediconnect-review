@@ -41,10 +41,21 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Password <span class="text-danger">*</span></label>
-                        <input type="password" name="password" class="form-control" minlength="8" required>
-                        <small class="text-muted">At least 8 characters. The doctor can change it later.</small>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Password <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" minlength="8" required>
+                            <small class="text-muted">At least 8 characters. The doctor can change it later.</small>
+                        </div>
+
+                        {{-- Without a second field, a typo here locks the doctor
+                             out of an account nobody knows the password to. --}}
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Confirm password <span class="text-danger">*</span></label>
+                            <input type="password" name="password_confirmation" class="form-control" minlength="8"
+                                required>
+                            <small class="text-muted">Type the same password again.</small>
+                        </div>
                     </div>
 
                     <div class="row">
