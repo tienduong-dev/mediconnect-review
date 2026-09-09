@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Doctor Professional Profile')
+
 @section('admin-content')
     <section class="container">
 

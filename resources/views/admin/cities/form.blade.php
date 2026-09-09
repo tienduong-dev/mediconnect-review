@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', $city->id ? 'Edit City' : 'New City')
+
 @section('admin-content')
     @php($isEdit = (bool) $city->id)
 
@@ -52,5 +54,26 @@
                 </div>
             </form>
         </div>
+        @if ($isEdit)
+            <div class="card shadow mt-4 border-danger-subtle">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="mb-0 text-danger fw-bold">Danger zone</h6>
+                </div>
+                <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div class="small text-muted mb-0">
+                        Deleting cannot be undone. A city that still has facilities cannot be deleted.
+                        Prefer setting the record to Inactive instead.
+                    </div>
+                    <form method="POST" action="{{ url('Admin/Cities/Delete', $city->id) }}"
+                        onsubmit="return confirm('Permanently delete this city? This cannot be undone.')">
+                        @csrf
+                        <button class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> Delete city
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endif
+
     </section>
 @endsection

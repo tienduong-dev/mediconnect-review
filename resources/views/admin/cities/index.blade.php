@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Cities')
+
 @section('admin-content')
     <section class="container">
 
@@ -38,11 +40,11 @@
                     <thead>
                         <tr>
                             <th style="width:1%">#</th>
-                            <th>City name</th>
-                            <th>State</th>
-                            <th>Country</th>
+                            <th>@include('admin.partials.sort', ['label' => 'City name', 'field' => 'name'])</th>
+                            <th>@include('admin.partials.sort', ['label' => 'State', 'field' => 'state'])</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Country', 'field' => 'country'])</th>
                             <th class="text-center">Facilities</th>
-                            <th class="text-center">Status</th>
+                            <th class="text-center">@include('admin.partials.sort', ['label' => 'Status', 'field' => 'status'])</th>
                             <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
                     </thead>
@@ -55,24 +57,17 @@
                                 <td>{{ $city->country }}</td>
                                 <td class="text-center">{{ $city->facilities_count }}</td>
                                 <td class="text-center">
-                                    <form method="POST" action="{{ url('Admin/Cities/ToggleStatus', $city->id) }}"
-                                        class="d-inline">
+                                    <form method="POST" action="{{ url('Admin/Cities/ToggleStatus', $city->id) }}" class="d-inline"
+                                        onsubmit="return confirm('Set this record to {{ $city->status === 'Active' ? 'Inactive' : 'Active' }}?')">
                                         @csrf
                                         <button class="btn btn-sm status-pill {{ $city->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
-                                            title="Click to toggle status">
-                                            {{ $city->status }}
-                                        </button>
+                                            title="Click to toggle status">{{ $city->status }}</button>
                                     </form>
                                 </td>
                                 <td class="text-center text-nowrap">
                                     <a href="{{ url('Admin/Cities/Edit', $city->id) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i> Edit
                                     </a>
-                                    <form method="POST" action="{{ url('Admin/Cities/Delete', $city->id) }}" class="d-inline"
-                                        onsubmit="return confirm('Delete city {{ $city->name }}?')">
-                                        @csrf
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
-                                    </form>
                                 </td>
                             </tr>
                         @empty
@@ -85,7 +80,7 @@
             </div>
 
             <div class="card-footer">
-                {{ $cities->links() }}
+                @include('admin.partials.listing-footer', ['paginator' => $cities])
             </div>
         </div>
     </section>

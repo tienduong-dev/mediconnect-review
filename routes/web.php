@@ -18,6 +18,7 @@ use App\Http\Controllers\ContactController;
 // ------ Admin controllers (all live in App\Http\Controllers\Admin) ------
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\PatientController as AdminPatientController;
+use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\SpecializationController;
@@ -76,11 +77,15 @@ Route::middleware(['isAdmin'])->group(function () {
     Route::get('Admin/Doctor/EditThisProfile/{id}', [AdminController::class, 'getAdminEditDoctorDetailsFormData']);
     Route::post('Admin/Doctor/SaveThisEditedDetailsNow', [AdminController::class, 'saveThisDoctorDetails']);
     Route::post('Admin/Doctor/updateStatus', [AdminController::class, 'updateDoctorStatus']);
-    Route::get('Admin/Appointments', [AdminController::class, 'getAppointmentPage']);
 
 
-    // ------ Admin Appointment Control Router's ------
-    Route::post('Admin/Appointment/UpdateStatus', [AdminController::class, 'updateAppointmentStatus']);
+    // ------ Admin appointment workflow: confirm / adjust / reject ------
+    Route::get('Admin/Appointments', [AdminAppointmentController::class, 'index']);
+    Route::get('Admin/Appointments/Show/{id}', [AdminAppointmentController::class, 'show']);
+    Route::post('Admin/Appointments/Confirm/{id}', [AdminAppointmentController::class, 'confirm']);
+    Route::post('Admin/Appointments/Reject/{id}', [AdminAppointmentController::class, 'reject']);
+    Route::get('Admin/Appointments/Adjust/{id}', [AdminAppointmentController::class, 'adjustForm']);
+    Route::post('Admin/Appointments/Adjust/{id}', [AdminAppointmentController::class, 'adjust']);
 
 
     // ==================================================================

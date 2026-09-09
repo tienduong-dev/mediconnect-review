@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Dashboard')
+
 @section('admin-content')
     <section class="container-fluid px-0">
 
@@ -10,23 +12,26 @@
         <div class="row g-3 mb-4">
             @php
                 $tiles = [
-                    ['label' => 'Pending',   'value' => $appointments['pending'],   'tone' => 'warning'],
-                    ['label' => 'Confirmed', 'value' => $appointments['confirmed'], 'tone' => 'primary'],
-                    ['label' => 'Completed', 'value' => $appointments['completed'], 'tone' => 'success'],
-                    ['label' => 'Cancelled', 'value' => $appointments['cancelled'], 'tone' => 'secondary'],
-                    ['label' => 'Rejected',  'value' => $appointments['rejected'],  'tone' => 'danger'],
-                    ['label' => 'No show',   'value' => $appointments['no_show'],   'tone' => 'dark'],
+                    ['label' => 'Pending',   'value' => $appointments['pending'],   'tone' => 'warning',   'status' => 'Pending'],
+                    ['label' => 'Confirmed', 'value' => $appointments['confirmed'], 'tone' => 'primary',   'status' => 'Confirmed'],
+                    ['label' => 'Completed', 'value' => $appointments['completed'], 'tone' => 'success',   'status' => 'Completed'],
+                    ['label' => 'Cancelled', 'value' => $appointments['cancelled'], 'tone' => 'secondary', 'status' => 'Cancelled'],
+                    ['label' => 'Rejected',  'value' => $appointments['rejected'],  'tone' => 'danger',    'status' => 'Rejected'],
+                    ['label' => 'No show',   'value' => $appointments['no_show'],   'tone' => 'dark',      'status' => 'NoShow'],
                 ];
             @endphp
 
             @foreach ($tiles as $tile)
                 <div class="col-6 col-md-4 col-xl-2">
-                    <div class="card h-100">
-                        <div class="card-body py-3">
-                            <div class="small text-muted">{{ $tile['label'] }}</div>
-                            <div class="fs-3 fw-bold text-{{ $tile['tone'] }}">{{ $tile['value'] }}</div>
+                    {{-- Each tile opens the appointment list already filtered by that status --}}
+                    <a href="{{ url('Admin/Appointments') }}?status={{ $tile['status'] }}" class="tile-link">
+                        <div class="card h-100">
+                            <div class="card-body py-3">
+                                <div class="small text-muted">{{ $tile['label'] }}</div>
+                                <div class="fs-3 fw-bold text-{{ $tile['tone'] }}">{{ $tile['value'] }}</div>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             @endforeach
         </div>
@@ -49,6 +54,7 @@
                 </div>
             </div>
             <div class="col-md-6 col-xl-3">
+                <a href="{{ url('Admin/Doctors') }}" class="tile-link h-100">
                 <div class="card h-100">
                     <div class="card-body py-3">
                         <div class="small text-muted">Doctors</div>
@@ -58,8 +64,10 @@
                         </div>
                     </div>
                 </div>
+                </a>
             </div>
             <div class="col-md-6 col-xl-3">
+                <a href="{{ url('Admin/Patients') }}" class="tile-link h-100">
                 <div class="card h-100">
                     <div class="card-body py-3">
                         <div class="small text-muted">Patients</div>
@@ -69,6 +77,7 @@
                         </div>
                     </div>
                 </div>
+                </a>
             </div>
         </div>
 

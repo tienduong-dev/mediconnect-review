@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Facilities')
+
 @section('admin-content')
     <section class="container">
 
@@ -46,13 +48,13 @@
                     <thead>
                         <tr>
                             <th style="width:1%">#</th>
-                            <th>Code</th>
-                            <th>Facility name</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Code', 'field' => 'code'])</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Facility name', 'field' => 'name'])</th>
                             <th>City</th>
                             <th>Address</th>
-                            <th>Phone</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Phone', 'field' => 'phone'])</th>
                             <th class="text-center">Specialization</th>
-                            <th class="text-center">Status</th>
+                            <th class="text-center">@include('admin.partials.sort', ['label' => 'Status', 'field' => 'status'])</th>
                             <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
                     </thead>
@@ -67,24 +69,17 @@
                                 <td>{{ $f->phone }}</td>
                                 <td class="text-center">{{ $f->facility_specializations_count }}</td>
                                 <td class="text-center">
-                                    <form method="POST" action="{{ url('Admin/Facilities/ToggleStatus', $f->id) }}"
-                                        class="d-inline">
+                                    <form method="POST" action="{{ url('Admin/Facilities/ToggleStatus', $f->id) }}" class="d-inline"
+                                        onsubmit="return confirm('Set this record to {{ $f->status === 'Active' ? 'Inactive' : 'Active' }}?')">
                                         @csrf
                                         <button class="btn btn-sm status-pill {{ $f->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
-                                            title="Click to toggle status">
-                                            {{ $f->status }}
-                                        </button>
+                                            title="Click to toggle status">{{ $f->status }}</button>
                                     </form>
                                 </td>
                                 <td class="text-center text-nowrap">
                                     <a href="{{ url('Admin/Facilities/Edit', $f->id) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i> Edit
                                     </a>
-                                    <form method="POST" action="{{ url('Admin/Facilities/Delete', $f->id) }}" class="d-inline"
-                                        onsubmit="return confirm('Delete facility {{ $f->name }}?')">
-                                        @csrf
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
-                                    </form>
                                 </td>
                             </tr>
                         @empty
@@ -97,7 +92,7 @@
             </div>
 
             <div class="card-footer">
-                {{ $facilities->links() }}
+                @include('admin.partials.listing-footer', ['paginator' => $facilities])
             </div>
         </div>
     </section>

@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', $item->id ? 'Edit Facility Specialization' : 'Assign Specialization')
+
 @section('admin-content')
     @php($isEdit = (bool) $item->id)
 
@@ -61,5 +63,26 @@
                 </div>
             </form>
         </div>
+        @if ($isEdit)
+            <div class="card shadow mt-4 border-danger-subtle">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="mb-0 text-danger fw-bold">Danger zone</h6>
+                </div>
+                <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div class="small text-muted mb-0">
+                        Deleting cannot be undone. A mapping with doctors assigned to it cannot be deleted.
+                        Prefer setting the record to Inactive instead.
+                    </div>
+                    <form method="POST" action="{{ url('Admin/FacilitySpecializations/Delete', $item->id) }}"
+                        onsubmit="return confirm('Permanently delete this mapping? This cannot be undone.')">
+                        @csrf
+                        <button class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> Delete mapping
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endif
+
     </section>
 @endsection

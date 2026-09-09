@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Doctor Assignments')
+
 @section('admin-content')
     <section class="container">
 
@@ -55,10 +57,10 @@
                             <th>Doctor</th>
                             <th>Facility</th>
                             <th>Specialization</th>
-                            <th>Room</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Room', 'field' => 'room_number'])</th>
                             <th class="text-end">Fee</th>
                             <th class="text-center">Slots</th>
-                            <th class="text-center">Status</th>
+                            <th class="text-center">@include('admin.partials.sort', ['label' => 'Status', 'field' => 'status'])</th>
                             <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
                     </thead>
@@ -80,13 +82,11 @@
                                 <td class="text-end">{{ number_format($a->consultation_fee, 2) }}</td>
                                 <td class="text-center">{{ $a->appointment_slots_count }}</td>
                                 <td class="text-center">
-                                    <form method="POST" action="{{ url('Admin/DoctorAssignments/ToggleStatus', $a->id) }}"
-                                        class="d-inline">
+                                    <form method="POST" action="{{ url('Admin/DoctorAssignments/ToggleStatus', $a->id) }}" class="d-inline"
+                                        onsubmit="return confirm('Set this record to {{ $a->status === 'Active' ? 'Inactive' : 'Active' }}?')">
                                         @csrf
                                         <button class="btn btn-sm status-pill {{ $a->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
-                                            title="Click to toggle status">
-                                            {{ $a->status }}
-                                        </button>
+                                            title="Click to toggle status">{{ $a->status }}</button>
                                     </form>
                                 </td>
                                 <td class="text-center text-nowrap">
@@ -94,12 +94,6 @@
                                         class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i> Edit
                                     </a>
-                                    <form method="POST" action="{{ url('Admin/DoctorAssignments/Delete', $a->id) }}"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Deleting this assignment also removes its schedules and generated slots. Continue?')">
-                                        @csrf
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
-                                    </form>
                                 </td>
                             </tr>
                         @empty
@@ -112,7 +106,7 @@
             </div>
 
             <div class="card-footer">
-                {{ $assignments->links() }}
+                @include('admin.partials.listing-footer', ['paginator' => $assignments])
             </div>
         </div>
     </section>

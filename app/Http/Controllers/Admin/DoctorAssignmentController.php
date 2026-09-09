@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\Concerns\SortsListings;
 use App\Models\Doctor;
 use App\Models\DoctorAssignment;
 use App\Models\Facility;
@@ -22,6 +23,8 @@ use Illuminate\Validation\Rule;
  */
 class DoctorAssignmentController extends Controller
 {
+    use SortsListings;
+
     public function index(Request $req)
     {
         $query = DoctorAssignment::with([
@@ -46,7 +49,9 @@ class DoctorAssignmentController extends Controller
             $query->where('status', $req->status);
         }
 
-        $assignments = $query->orderByDesc('id')->paginate(10)->withQueryString();
+        $this->applySort($query, $req, ['consultation_fee', 'room_number', 'status', 'appointment_slots_count', 'id'], 'id', 'desc');
+
+        $assignments = $query->paginate($this->perPage($req))->withQueryString();
 
         return view('admin.doctor-assignments.index', [
             'assignments' => $assignments,

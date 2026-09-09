@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Doctors')
+
 @section('admin-content')
     <section class="container">
 
@@ -53,10 +55,10 @@
                     <thead>
                         <tr>
                             <th style="width:1%">#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Number</th>
-                            <th class="text-center">Account</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Name', 'field' => 'name'])</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Email', 'field' => 'email'])</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Number', 'field' => 'number'])</th>
+                            <th class="text-center">@include('admin.partials.sort', ['label' => 'Account', 'field' => 'account_status'])</th>
                             <th class="text-center">Profile status</th>
                             <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
@@ -77,17 +79,7 @@
 
                                 <td class="text-center">
                                     @if ($d->doctorDetails)
-                                        <form action="{{ url('Admin/Doctor/updateStatus') }}" method="POST"
-                                            class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="id" value="{{ $d->doctorDetails->id }}">
-                                            <input type="hidden" name="name" value="{{ $d->name }}">
-                                            <button type="submit"
-                                                class="btn btn-sm status-pill {{ $d->doctorDetails->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
-                                                title="Click to toggle status">
-                                                {{ $d->doctorDetails->status }}
-                                            </button>
-                                        </form>
+                                        <span class="badge {{ $d->doctorDetails->status === 'Active' ? 'bg-success' : 'bg-secondary' }}">{{ $d->doctorDetails->status }}</span>
                                     @else
                                         <span class="badge bg-warning text-dark">No profile</span>
                                     @endif
@@ -98,17 +90,6 @@
                                         class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-person-lines-fill"></i> Profile
                                     </a>
-
-                                    <form method="POST"
-                                        action="{{ url('Admin/User/ToggleAccountStatus', $d->id) }}" class="d-inline"
-                                        onsubmit="return confirm('{{ $d->account_status === 'Active' ? 'Deactivate' : 'Reactivate' }} the account of {{ $d->name }}?')">
-                                        @csrf
-                                        <button
-                                            class="btn btn-sm {{ $d->account_status === 'Active' ? 'btn-outline-danger' : 'btn-outline-success' }}">
-                                            <i class="bi {{ $d->account_status === 'Active' ? 'bi-lock' : 'bi-unlock' }}"></i>
-                                            {{ $d->account_status === 'Active' ? 'Deactivate' : 'Reactivate' }}
-                                        </button>
-                                    </form>
                                 </td>
                             </tr>
                         @empty
@@ -121,7 +102,7 @@
             </div>
 
             <div class="card-footer">
-                {{ $doctors->links() }}
+                @include('admin.partials.listing-footer', ['paginator' => $doctors])
             </div>
         </div>
     </section>

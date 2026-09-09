@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Doctor Details')
+
 @section('admin-content')
     <section class="container">
 
@@ -127,8 +129,19 @@
             <div class="col-lg-4">
                 <div class="card shadow">
                     <div class="card-body text-center">
-                        <img src="{{ asset('upload/doctors/' . $doctor->image) }}" alt="Doctor photo"
-                            class="img-fluid rounded mb-3" style="border:1px solid #e4e9f0;">
+                        {{-- The seed data stores 'person1.jpg', which does not exist in
+                             public/upload/doctors, so fall back to initials instead of a
+                             broken image icon. --}}
+                        @php($photoPath = $doctor->image ? public_path('upload/doctors/' . $doctor->image) : null)
+                        @if ($photoPath && is_file($photoPath))
+                            <img src="{{ asset('upload/doctors/' . $doctor->image) }}" alt="{{ $user->name }}"
+                                class="img-fluid rounded mb-3" style="border:1px solid #e4e9f0;">
+                        @else
+                            <div class="avatar-fallback mb-3">
+                                {{ \Illuminate\Support\Str::of($user->name)->substr(0, 1)->upper() }}
+                            </div>
+                            <div class="small text-muted mb-3">No photo uploaded</div>
+                        @endif
 
                         <div class="d-grid gap-2">
                             <a href="{{ url('Admin/Doctor/EditThisProfile', $user->id) }}" class="btn btn-primary">
@@ -137,6 +150,18 @@
                             <a href="{{ url('Admin/Doctors') }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left"></i> Back to doctors
                             </a>
+
+                            {{-- Controls whether the doctor is visible to patients --}}
+                            <form action="{{ url('Admin/Doctor/updateStatus') }}" method="POST"
+                                onsubmit="return confirm('{{ $doctor->status === 'Active' ? 'Hide this doctor from patient search?' : 'Make this doctor visible to patients again?' }}')">
+                                @csrf
+                                <input type="hidden" name="id" value="{{ $doctor->id }}">
+                                <input type="hidden" name="name" value="{{ $user->name }}">
+                                <button class="btn w-100 {{ $doctor->status === 'Active' ? 'btn-outline-warning' : 'btn-outline-success' }}">
+                                    <i class="bi {{ $doctor->status === 'Active' ? 'bi-eye-slash' : 'bi-eye' }}"></i>
+                                    {{ $doctor->status === 'Active' ? 'Hide from patient search' : 'Show in patient search' }}
+                                </button>
+                            </form>
                             {{-- Accounts are deactivated, never deleted: a hard delete would
                                  cascade away assignments, schedules and slots, and detach the
                                  doctor from past appointments. --}}

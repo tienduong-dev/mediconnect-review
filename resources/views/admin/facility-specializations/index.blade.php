@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Facility Specializations')
+
 @section('admin-content')
     <section class="container">
 
@@ -60,7 +62,7 @@
                             <th>City</th>
                             <th>Specialization</th>
                             <th class="text-center">Doctors</th>
-                            <th class="text-center">Status</th>
+                            <th class="text-center">@include('admin.partials.sort', ['label' => 'Status', 'field' => 'status'])</th>
                             <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
                     </thead>
@@ -73,15 +75,11 @@
                                 <td>{{ $item->specialization->name ?? '—' }}</td>
                                 <td class="text-center">{{ $item->doctor_assignments_count }}</td>
                                 <td class="text-center">
-                                    <form method="POST"
-                                        action="{{ url('Admin/FacilitySpecializations/ToggleStatus', $item->id) }}"
-                                        class="d-inline">
+                                    <form method="POST" action="{{ url('Admin/FacilitySpecializations/ToggleStatus', $item->id) }}" class="d-inline"
+                                        onsubmit="return confirm('Set this record to {{ $item->status === 'Active' ? 'Inactive' : 'Active' }}?')">
                                         @csrf
-                                        <button
-                                            class="btn btn-sm status-pill {{ $item->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
-                                            title="Click to toggle status">
-                                            {{ $item->status }}
-                                        </button>
+                                        <button class="btn btn-sm status-pill {{ $item->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
+                                            title="Click to toggle status">{{ $item->status }}</button>
                                     </form>
                                 </td>
                                 <td class="text-center text-nowrap">
@@ -107,7 +105,7 @@
             </div>
 
             <div class="card-footer">
-                {{ $items->links() }}
+                @include('admin.partials.listing-footer', ['paginator' => $items])
             </div>
         </div>
     </section>

@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Patients')
+
 @section('admin-content')
     <section class="container">
 
@@ -46,11 +48,11 @@
                     <thead>
                         <tr>
                             <th style="width:1%">#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Number</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Name', 'field' => 'name'])</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Email', 'field' => 'email'])</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Number', 'field' => 'number'])</th>
                             <th>City</th>
-                            <th class="text-center">Account</th>
+                            <th class="text-center">@include('admin.partials.sort', ['label' => 'Account', 'field' => 'account_status'])</th>
                             <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
                     </thead>
@@ -76,16 +78,6 @@
                                         class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i> Edit
                                     </a>
-                                    <form method="POST"
-                                        action="{{ url('Admin/User/ToggleAccountStatus', $p->id) }}" class="d-inline"
-                                        onsubmit="return confirm('{{ $p->account_status === 'Active' ? 'Deactivate' : 'Reactivate' }} the account of {{ $p->name }}?')">
-                                        @csrf
-                                        <button
-                                            class="btn btn-sm {{ $p->account_status === 'Active' ? 'btn-outline-danger' : 'btn-outline-success' }}">
-                                            <i class="bi {{ $p->account_status === 'Active' ? 'bi-lock' : 'bi-unlock' }}"></i>
-                                            {{ $p->account_status === 'Active' ? 'Deactivate' : 'Reactivate' }}
-                                        </button>
-                                    </form>
                                 </td>
                             </tr>
                         @empty
@@ -98,7 +90,7 @@
             </div>
 
             <div class="card-footer">
-                {{ $patients->links() }}
+                @include('admin.partials.listing-footer', ['paginator' => $patients])
             </div>
         </div>
     </section>

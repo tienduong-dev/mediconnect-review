@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\Concerns\SortsListings;
 use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class CityController extends Controller
 {
+    use SortsListings;
+
     public function index(Request $req)
     {
         $query = City::withCount('facilities');
@@ -21,7 +24,9 @@ class CityController extends Controller
             $query->where('status', $req->status);
         }
 
-        $cities = $query->orderBy('name')->paginate(10)->withQueryString();
+        $this->applySort($query, $req, ['name', 'state', 'country', 'status', 'facilities_count'], 'name');
+
+        $cities = $query->paginate($this->perPage($req))->withQueryString();
 
         return view('admin.cities.index', compact('cities'));
     }

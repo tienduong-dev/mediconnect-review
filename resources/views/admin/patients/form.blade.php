@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', $patient->id ? 'Edit Patient' : 'New Patient')
+
 @section('admin-content')
     @php($isEdit = (bool) $patient->id)
 

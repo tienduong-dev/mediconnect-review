@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\Concerns\SortsListings;
 use App\Models\Specialization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -10,6 +11,8 @@ use Illuminate\Validation\Rule;
 
 class SpecializationController extends Controller
 {
+    use SortsListings;
+
     public function index(Request $req)
     {
         $query = Specialization::withCount('facilitySpecializations');
@@ -22,7 +25,9 @@ class SpecializationController extends Controller
             $query->where('status', $req->status);
         }
 
-        $specializations = $query->orderBy('name')->paginate(10)->withQueryString();
+        $this->applySort($query, $req, ['name', 'slug', 'status', 'facility_specializations_count'], 'name');
+
+        $specializations = $query->paginate($this->perPage($req))->withQueryString();
 
         return view('admin.specializations.index', compact('specializations'));
     }

@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Specializations')
+
 @section('admin-content')
     <section class="container">
 
@@ -38,11 +40,11 @@
                     <thead>
                         <tr>
                             <th style="width:1%">#</th>
-                            <th>Specialization name</th>
-                            <th>Slug</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Specialization name', 'field' => 'name'])</th>
+                            <th>@include('admin.partials.sort', ['label' => 'Slug', 'field' => 'slug'])</th>
                             <th>Description</th>
                             <th class="text-center">Facilities</th>
-                            <th class="text-center">Status</th>
+                            <th class="text-center">@include('admin.partials.sort', ['label' => 'Status', 'field' => 'status'])</th>
                             <th class="text-center text-nowrap" style="width:1%">Actions</th>
                         </tr>
                     </thead>
@@ -55,13 +57,11 @@
                                 <td>{{ Str::limit($sp->description, 60) ?: '—' }}</td>
                                 <td class="text-center">{{ $sp->facility_specializations_count }}</td>
                                 <td class="text-center">
-                                    <form method="POST" action="{{ url('Admin/Specializations/ToggleStatus', $sp->id) }}"
-                                        class="d-inline">
+                                    <form method="POST" action="{{ url('Admin/Specializations/ToggleStatus', $sp->id) }}" class="d-inline"
+                                        onsubmit="return confirm('Set this record to {{ $sp->status === 'Active' ? 'Inactive' : 'Active' }}?')">
                                         @csrf
                                         <button class="btn btn-sm status-pill {{ $sp->status === 'Active' ? 'btn-success' : 'btn-secondary' }}"
-                                            title="Click to toggle status">
-                                            {{ $sp->status }}
-                                        </button>
+                                            title="Click to toggle status">{{ $sp->status }}</button>
                                     </form>
                                 </td>
                                 <td class="text-center text-nowrap">
@@ -69,12 +69,6 @@
                                         class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i> Edit
                                     </a>
-                                    <form method="POST" action="{{ url('Admin/Specializations/Delete', $sp->id) }}"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Delete specialization {{ $sp->name }}?')">
-                                        @csrf
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
-                                    </form>
                                 </td>
                             </tr>
                         @empty
@@ -87,7 +81,7 @@
             </div>
 
             <div class="card-footer">
-                {{ $specializations->links() }}
+                @include('admin.partials.listing-footer', ['paginator' => $specializations])
             </div>
         </div>
     </section>

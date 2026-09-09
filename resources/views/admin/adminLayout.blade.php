@@ -150,6 +150,54 @@
             font-weight: 700;
             margin-bottom: .25rem;
         }
+
+        /* Initials shown when a doctor has no usable photo file */
+        .admin-page .avatar-fallback {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            border-radius: 12px;
+            background: #eef2f8;
+            color: #5c6b85;
+            font-size: 44px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Keep destructive actions visually apart from navigation ones */
+        .admin-page .table td .btn + .btn,
+        .admin-page .table td .btn + form { margin-left: .35rem; }
+
+        .admin-page .badge { font-size: 12px; padding: .45em .7em; font-weight: 600; }
+
+        .admin-page .pagination { margin: 0; }
+        .admin-page .page-link { font-size: 14px; }
+
+        .admin-page .alert { font-size: 14px; border-radius: 10px; }
+
+        /* Sortable column headers */
+        .admin-page .sort-link {
+            color: inherit;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .admin-page .sort-link:hover { color: #2b3445; }
+        .admin-page .sort-link .bi-arrow-down-up { opacity: .35; font-size: 11px; }
+        .admin-page .sort-link .bi-caret-up-fill,
+        .admin-page .sort-link .bi-caret-down-fill { color: #4c7cf3; font-size: 11px; }
+
+        /* Danger zone keeps a light header instead of the dark card style */
+        .admin-page .card-header.bg-white { background: #fff !important; }
+
+        /* Clickable dashboard tiles */
+        .admin-page a.tile-link { text-decoration: none; color: inherit; display: block; }
+        .admin-page a.tile-link .card { transition: box-shadow .15s, transform .15s; }
+        .admin-page a.tile-link:hover .card {
+            box-shadow: 0 4px 12px rgba(16, 24, 40, .12);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 
@@ -295,11 +343,9 @@
 
             <!-- ================== TOPBAR (NEW LIKE TEMPLATE) ================== -->
             <div class="d-flex justify-content-between align-items-center p-3 bg-white shadow-sm">
-                <h5 class="mb-0" id="current">Admin Dashboard</h5>
-                <div class="d-flex align-items-center gap-3">
-                    <!-- Search -->
-                    <input type="text" class="form-control" placeholder="Search..." style="width:200px;">
-                    <!-- User -->
+                <h5 class="mb-0 fw-semibold">@yield('page-title', 'Dashboard')</h5>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-person-circle"></i>
                     <span>{{ auth()->user()->name ?? 'Admin' }}</span>
                 </div>
             </div>
@@ -486,15 +532,7 @@
     <script src="{{ asset('assets/js/vanilla-tilt.min.js') }}"></script>
     <!--<< Main.js >>-->
     <script src="{{ asset('assets/js/main.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            let title = window.location.pathname.split('/').filter(Boolean).pop();
-            if (title == "AdminDashboard") {
-                title = "Admin Dashboard";
-            }
-            document.getElementById('current').innerHTML = title;
-        });
-    </script>
+
 </body>
 
 

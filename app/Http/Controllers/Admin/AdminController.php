@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Appointments;
+use App\Http\Controllers\Admin\Concerns\SortsListings;
 use App\Models\City;
 use App\Models\Doctor;
 use App\Models\User;
@@ -13,6 +13,8 @@ use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
+    use SortsListings;
+
     public function dashboard()
     {
         // Accounts, split by the account_status the admin can toggle
@@ -68,29 +70,6 @@ class AdminController extends Controller
             'newContactMessages',
             'pendingQueue'
         ));
-    }
-
-    // ============= Appointment Control =============
-
-    public function getAppointmentPage()
-    {
-        $appointments = Appointments::with(['patient', 'doctor.user'])->paginate(8);
-
-        return view('admin.AdminAppointments', compact('appointments'));
-    }
-
-    public function updateAppointmentStatus(Request $req)
-    {
-        $appointment = Appointments::find($req->id);
-
-        if (!$appointment) {
-            return back()->with('error', 'Appointment not found.');
-        }
-
-        $appointment->status = $req->status;
-        $appointment->save();
-
-        return redirect('Admin/AdminDashboard');
     }
 
     // ============= Account Control =============
@@ -194,7 +173,9 @@ class AdminController extends Controller
             $query->whereHas('doctorDetails', fn($q) => $q->where('status', $req->profile));
         }
 
-        $doctors = $query->orderBy('name')->paginate(10)->withQueryString();
+        $this->applySort($query, $req, ['name', 'email', 'number', 'account_status'], 'name');
+
+        $doctors = $query->paginate($this->perPage($req))->withQueryString();
 
         return view('admin.AdminDoctors', compact('doctors'));
     }
@@ -222,13 +203,18 @@ class AdminController extends Controller
         $doctor = Doctor::find($req->id);
 
         if (!$doctor) {
-            return redirect('Admin/Doctors')->with('error', 'Doctor profile not found.');
+            return back()->with('error', 'Doctor profile not found.');
         }
 
         $doctor->status = $doctor->status === 'Active' ? 'Inactive' : 'Active';
         $doctor->save();
 
-        return redirect('Admin/Doctors')->with('success', 'Status updated for doctor ' . $req->name . '.');
+        $visibility = $doctor->status === 'Active'
+            ? 'is now visible in patient search'
+            : 'is now hidden from patient search';
+
+        // Triggered from the doctor detail page, so stay on it
+        return back()->with('success', 'Dr. ' . $req->name . ' ' . $visibility . '.');
     }
 
     public function getAddDoctorDetailsFormData($id)

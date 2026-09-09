@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\Concerns\SortsListings;
 use App\Models\City;
 use App\Models\PatientProfile;
 use App\Models\User;
@@ -19,6 +20,8 @@ use Illuminate\Validation\Rule;
  */
 class PatientController extends Controller
 {
+    use SortsListings;
+
     public function index(Request $req)
     {
         $query = User::where('user_type', 'Patient');
@@ -40,7 +43,9 @@ class PatientController extends Controller
             $query->where('account_status', $req->account_status);
         }
 
-        $patients = $query->orderBy('name')->paginate(10)->withQueryString();
+        $this->applySort($query, $req, ['name', 'email', 'number', 'account_status'], 'name');
+
+        $patients = $query->paginate($this->perPage($req))->withQueryString();
 
         return view('admin.AdminPatients', [
             'patients'  => $patients,

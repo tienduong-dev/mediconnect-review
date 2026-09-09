@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', 'Edit Doctor')
+
 @section('admin-content')
     <section class="container">
 
@@ -127,8 +129,13 @@
 
                         <div class="col-md-4">
                             <label class="form-label">Profile photo</label>
-                            <img id="preview" src="{{ asset('upload/doctors/' . $doctor->image) }}" alt="Doctor photo"
-                                class="img-fluid rounded mb-2" style="border:1px solid #e4e9f0;">
+                            @php($photoPath = $doctor->image ? public_path('upload/doctors/' . $doctor->image) : null)
+                            <img id="preview" alt="{{ $user->name }}" class="img-fluid rounded mb-2"
+                                style="border:1px solid #e4e9f0; {{ $photoPath && is_file($photoPath) ? '' : 'display:none;' }}"
+                                src="{{ $photoPath && is_file($photoPath) ? asset('upload/doctors/' . $doctor->image) : '' }}">
+                            @if (!($photoPath && is_file($photoPath)))
+                                <div class="small text-muted mb-2">No photo on file yet.</div>
+                            @endif
                             <input type="file" name="image" id="image" class="form-control" accept="image/*">
                             <small class="text-muted">Leave empty to keep the current photo.</small>
                         </div>
@@ -147,7 +154,9 @@
         document.getElementById("image").addEventListener("change", function (event) {
             const file = event.target.files[0];
             if (file) {
-                document.getElementById("preview").src = URL.createObjectURL(file);
+                const preview = document.getElementById("preview");
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = "block";
             }
         });
     </script>

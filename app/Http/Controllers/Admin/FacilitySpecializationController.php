@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\Concerns\SortsListings;
 use App\Models\Facility;
 use App\Models\FacilitySpecialization;
 use App\Models\Specialization;
@@ -16,6 +17,8 @@ use Illuminate\Validation\Rule;
  */
 class FacilitySpecializationController extends Controller
 {
+    use SortsListings;
+
     public function index(Request $req)
     {
         $query = FacilitySpecialization::with(['facility.city', 'specialization'])
@@ -33,7 +36,9 @@ class FacilitySpecializationController extends Controller
             $query->where('status', $req->status);
         }
 
-        $items = $query->orderByDesc('id')->paginate(10)->withQueryString();
+        $this->applySort($query, $req, ['status', 'doctor_assignments_count', 'id'], 'id', 'desc');
+
+        $items = $query->paginate($this->perPage($req))->withQueryString();
 
         return view('admin.facility-specializations.index', [
             'items'           => $items,

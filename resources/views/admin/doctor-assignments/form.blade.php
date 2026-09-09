@@ -1,5 +1,7 @@
 @extends('admin/AdminLayout')
 
+@section('page-title', $assignment->id ? 'Edit Assignment' : 'New Assignment')
+
 @section('admin-content')
     @php($isEdit = (bool) $assignment->id)
 
@@ -88,5 +90,26 @@
                 </div>
             </form>
         </div>
+        @if ($isEdit)
+            <div class="card shadow mt-4 border-danger-subtle">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="mb-0 text-danger fw-bold">Danger zone</h6>
+                </div>
+                <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div class="small text-muted mb-0">
+                        Deleting cannot be undone. Deleting also removes the schedules and generated slots of this assignment.
+                        Prefer setting the record to Inactive instead.
+                    </div>
+                    <form method="POST" action="{{ url('Admin/DoctorAssignments/Delete', $assignment->id) }}"
+                        onsubmit="return confirm('Permanently delete this assignment? This cannot be undone.')">
+                        @csrf
+                        <button class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> Delete assignment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endif
+
     </section>
 @endsection

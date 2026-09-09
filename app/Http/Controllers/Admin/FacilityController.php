@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\Concerns\SortsListings;
 use App\Models\City;
 use App\Models\Facility;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Validation\Rule;
 
 class FacilityController extends Controller
 {
+    use SortsListings;
+
     public function index(Request $req)
     {
         $query = Facility::with('city')->withCount('facilitySpecializations');
@@ -29,7 +32,9 @@ class FacilityController extends Controller
             $query->where('status', $req->status);
         }
 
-        $facilities = $query->orderBy('name')->paginate(10)->withQueryString();
+        $this->applySort($query, $req, ['name', 'code', 'phone', 'status', 'facility_specializations_count'], 'name');
+
+        $facilities = $query->paginate($this->perPage($req))->withQueryString();
         $cities = City::orderBy('name')->get();
 
         return view('admin.facilities.index', compact('facilities', 'cities'));
