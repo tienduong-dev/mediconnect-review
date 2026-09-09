@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\SpecializationController;
 use App\Http\Controllers\Admin\FacilitySpecializationController;
 use App\Http\Controllers\Admin\DoctorAssignmentController;
+use App\Http\Controllers\Admin\MedicalContentController as AdminMedicalContentController;
 
 
 // ================ Patient Register Router's ================
@@ -136,6 +137,18 @@ Route::middleware(['isAdmin'])->group(function () {
     Route::post('Admin/DoctorAssignments/Update/{id}', [DoctorAssignmentController::class, 'update']);
     Route::post('Admin/DoctorAssignments/Delete/{id}', [DoctorAssignmentController::class, 'destroy']);
     Route::post('Admin/DoctorAssignments/ToggleStatus/{id}', [DoctorAssignmentController::class, 'toggleStatus']);
+
+    // Medical contents (health articles published on the public site)
+    Route::get('Admin/MedicalContents', [AdminMedicalContentController::class, 'index']);
+    Route::get('Admin/MedicalContents/Create', [AdminMedicalContentController::class, 'create']);
+    Route::post('Admin/MedicalContents/Store', [AdminMedicalContentController::class, 'store']);
+    Route::get('Admin/MedicalContents/Show/{id}', [AdminMedicalContentController::class, 'show']);
+    Route::get('Admin/MedicalContents/Edit/{id}', [AdminMedicalContentController::class, 'edit']);
+    Route::post('Admin/MedicalContents/Update/{id}', [AdminMedicalContentController::class, 'update']);
+    Route::post('Admin/MedicalContents/Publish/{id}', [AdminMedicalContentController::class, 'publish']);
+    Route::post('Admin/MedicalContents/Archive/{id}', [AdminMedicalContentController::class, 'archive']);
+    Route::post('Admin/MedicalContents/Restore/{id}', [AdminMedicalContentController::class, 'restore']);
+    Route::post('Admin/MedicalContents/Delete/{id}', [AdminMedicalContentController::class, 'destroy']);
 });
 
 Route::middleware(['isDoctor'])->group(function () {

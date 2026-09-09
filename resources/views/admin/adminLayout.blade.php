@@ -323,6 +323,18 @@
                         </a>
                     </li>
 
+                    {{-- ===== Content shown on the public site ===== --}}
+                    <li class="nav-item mt-3 mb-1">
+                        <span class="text-uppercase small fw-bold px-3" style="color:#8fa3bf; letter-spacing:1px;">
+                            Content
+                        </span>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="{{ url('Admin/MedicalContents') }}" class="nav-link text-white">
+                            <i class="bi bi-journal-medical"></i> Medical Contents
+                        </a>
+                    </li>
+
                     <li class="nav-item mt-4">
                         <a href="{{ url('logout') }}" class="nav-link text-danger">
                             <i class="bi bi-box-arrow-right"></i> Logout
