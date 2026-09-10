@@ -6,7 +6,7 @@
                     <div class="header-left">
                         <div class="logo">
                             <a href="{{ url('Patient/PatientDashboard') }}" class="header-logo">
-                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img" width="150px">
+                                <img src="{{ asset('assets/img/logo/mediconnect-full.png') }}" alt="logo-img" width="150px">
                             </a>
                         </div>
                     </div>

@@ -153,7 +153,7 @@
                         <div class="header-left">
                             <div class="logo">
                                 <a href="{{ url('index') }}" class="header-logo">
-                                    <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img" width="150px">
+                                    <img src="{{ asset('assets/img/logo/mediconnect-full.png') }}" alt="logo-img" width="150px">
                                 </a>
                             </div>
                         </div>
@@ -221,7 +221,7 @@
                             <div class="single-footer-widget wow fadeInUp" data-wow-delay="0.4s">
                                 <div class="widget-head">
                                     <a href="{{ url('index') }}">
-                                        <img src="{{ asset('assets/img/logo/logo-white.png') }}" alt="logo-img">
+                                        <img src="{{ asset('assets/img/logo/mediconnect-white.png') }}" alt="logo-img"width="260px">
                                     </a>
                                 </div>
                             </div>
@@ -265,7 +265,7 @@
                     <div class="offcanvas__top mb-4 d-flex justify-content-between align-items-center">
                         <div class="offcanvas__logo">
                             <a href="{{ url('index') }}">
-                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img">
+                                <img src="{{ asset('assets/img/logo/mediconnect-full.png') }}" alt="logo-img">
                             </a>
                         </div>
                         <div class="offcanvas__close">
@@ -345,7 +345,7 @@
                     <div class="offcanvas__top mb-4 d-flex justify-content-between align-items-center">
                         <div class="offcanvas__logo">
                             <a href="{{ url('index') }}">
-                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo-img">
+                                <img src="{{ asset('assets/img/logo/mediconnect-full.png') }}" alt="logo-img">
                             </a>
                         </div>
                         <div class="filter__close">
