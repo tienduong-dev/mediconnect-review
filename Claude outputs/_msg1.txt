@@ -1,7 +1,0 @@
-Admin: move controllers into App\Http\Controllers\Admin namespace
-
-Add master data CRUD for City, Facility, Specialization and
-FacilitySpecialization, each guarding deletion against foreign key
-restrictions. Enforce account_status in AdminMiddleware and align the
-DoctorSchedule model with the MediConnect schema, which links schedules
-to doctor_assignment_id instead of doctor_id.

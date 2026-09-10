@@ -1,6 +1,0 @@
-Add doctor assignment management for admin
-
-Assign a doctor to a facility and specialization pair, with room number
-and consultation fee stored per assignment rather than per doctor.
-Deletion is blocked while slots are held or booked, or while
-appointments are still pending or confirmed.
