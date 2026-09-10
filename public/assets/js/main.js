@@ -311,8 +311,8 @@ CSS TABLE OF CONTENTS
 		//>> Wow Animation Start <<//
 		new WOW().init();
 
-		//>> Nice Select Start <<//
-		$("select").niceSelect();
+		// Apply Nice Select except for dynamic doctor search fields
+		$("select").not(".doctor-search-select").niceSelect();
 
 		//>> Testimonial Slider Start <<//
 		const testimonial__slider1 = new Swiper(".testimonial-slider1", {
