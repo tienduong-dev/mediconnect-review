@@ -308,6 +308,63 @@
             text-overflow: ellipsis;
         }
 
+        .tb-search {
+            position: relative;
+            flex: 1 1 340px;
+            max-width: 420px;
+            margin-left: 18px;
+        }
+
+        .tb-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .tb-search input {
+            width: 100%;
+            height: 38px;
+            border-radius: 20px;
+            border: 1px solid var(--line-strong);
+            background: var(--surface-2);
+            color: var(--ink);
+            font-size: 13.5px;
+            padding: 0 42px 0 34px;
+            outline: none;
+            transition: background-color .15s var(--ease), border-color .15s var(--ease), box-shadow .15s var(--ease);
+        }
+
+        .tb-search input::placeholder { color: var(--muted); }
+
+        .tb-search input:focus {
+            background: var(--surface);
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
+        }
+
+        .tb-search input::-webkit-search-cancel-button { cursor: pointer; }
+
+        .tb-search kbd {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            font-family: inherit;
+            color: var(--muted);
+            background: var(--surface-3);
+            border: 1px solid var(--line-strong);
+            border-radius: 5px;
+            padding: 1px 6px;
+            pointer-events: none;
+        }
+
+        .tb-search input:focus + kbd { display: none; }
+
         .tb-right { margin-left: auto; display: flex; align-items: center; gap: 12px; white-space: nowrap; }
 
         .theme-btn {
@@ -806,6 +863,15 @@
             @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         }
 
+        @media (max-width: 1199.98px) {
+            .tb-search { max-width: 260px; flex-basis: 200px; }
+            .tb-search kbd { display: none; }
+        }
+
+        @media (max-width: 767.98px) {
+            .tb-search { display: none; }
+        }
+
         @media (max-width: 575.98px) {
             .tb-user .who { display: none; }
         }
@@ -908,6 +974,13 @@
 
         <h1>@yield('page-title', 'Dashboard')</h1>
 
+        <form class="tb-search" method="GET" action="{{ url('Admin/Search') }}" role="search">
+            <i class="bi bi-search"></i>
+            <input type="search" name="q" id="globalSearch" value="{{ request('q') }}" autocomplete="off"
+                placeholder="Search patients, doctors, appointments...">
+            <kbd>/</kbd>
+        </form>
+
         <div class="tb-right">
             <button type="button" class="theme-btn" data-theme-toggle aria-label="Switch theme" title="Switch theme">
                 <i class="bi bi-moon-stars"></i>
@@ -950,6 +1023,20 @@
                 root.setAttribute('data-theme', next);
                 try { localStorage.setItem('mc-theme', next); } catch (e) { /* ignore */ }
             });
+        });
+
+        /* ---- "/" focuses the search box, the way code hosts do it ----
+           Ignored while typing in a field, so a slash inside an address or
+           a note still types a slash. */
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+
+            var t = e.target;
+            var typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+            if (typing) return;
+
+            var box = document.getElementById('globalSearch');
+            if (box) { e.preventDefault(); box.focus(); box.select(); }
         });
 
         /* ---- Sidebar drawer on small screens ---- */

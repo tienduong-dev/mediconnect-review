@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\DoctorAssignmentController;
 use App\Http\Controllers\Admin\MedicalContentController as AdminMedicalContentController;
 use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 use App\Http\Controllers\Admin\AccountController as AdminAccountController;
+use App\Http\Controllers\Admin\SearchController as AdminSearchController;
 
 
 // ================ Patient Register Router's ================
@@ -167,6 +168,9 @@ Route::middleware(['isAdmin'])->group(function () {
     Route::get('Admin/MyAccount/Admins', [AdminAccountController::class, 'admins']);
     Route::post('Admin/MyAccount/Profile', [AdminAccountController::class, 'updateProfile']);
     Route::post('Admin/MyAccount/Password', [AdminAccountController::class, 'updatePassword']);
+
+    // One search box for the whole panel (read only)
+    Route::get('Admin/Search', [AdminSearchController::class, 'index']);
 });
 
 Route::middleware(['isDoctor'])->group(function () {
