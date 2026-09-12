@@ -182,7 +182,9 @@
                                 <tr>
                                     <th>New contact messages</th>
                                     <td class="text-end">{{ $newContactMessages }}</td>
-                                    <td>&mdash;</td>
+                                    <td>
+                                        <a href="{{ url('Admin/ContactMessages') }}?status=New">Open inbox</a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

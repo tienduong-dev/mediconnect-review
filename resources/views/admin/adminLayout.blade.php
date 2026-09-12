@@ -334,6 +334,11 @@
                             <i class="bi bi-journal-medical"></i> Medical Contents
                         </a>
                     </li>
+                    <li class="nav-item mb-2">
+                        <a href="{{ url('Admin/ContactMessages') }}" class="nav-link text-white">
+                            <i class="bi bi-envelope"></i> Contact Messages
+                        </a>
+                    </li>
 
                     <li class="nav-item mt-4">
                         <a href="{{ url('logout') }}" class="nav-link text-danger">

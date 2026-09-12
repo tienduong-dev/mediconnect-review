@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\SpecializationController;
 use App\Http\Controllers\Admin\FacilitySpecializationController;
 use App\Http\Controllers\Admin\DoctorAssignmentController;
 use App\Http\Controllers\Admin\MedicalContentController as AdminMedicalContentController;
+use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 
 
 // ================ Patient Register Router's ================
@@ -149,6 +150,16 @@ Route::middleware(['isAdmin'])->group(function () {
     Route::post('Admin/MedicalContents/Archive/{id}', [AdminMedicalContentController::class, 'archive']);
     Route::post('Admin/MedicalContents/Restore/{id}', [AdminMedicalContentController::class, 'restore']);
     Route::post('Admin/MedicalContents/Delete/{id}', [AdminMedicalContentController::class, 'destroy']);
+
+    // Contact messages (inbox for the public contact form)
+    Route::get('Admin/ContactMessages', [AdminContactMessageController::class, 'index']);
+    Route::get('Admin/ContactMessages/Show/{id}', [AdminContactMessageController::class, 'show']);
+    Route::post('Admin/ContactMessages/Start/{id}', [AdminContactMessageController::class, 'start']);
+    Route::post('Admin/ContactMessages/Resolve/{id}', [AdminContactMessageController::class, 'resolve']);
+    Route::post('Admin/ContactMessages/Spam/{id}', [AdminContactMessageController::class, 'spam']);
+    Route::post('Admin/ContactMessages/Reopen/{id}', [AdminContactMessageController::class, 'reopen']);
+    Route::post('Admin/ContactMessages/Notes/{id}', [AdminContactMessageController::class, 'saveNotes']);
+    Route::post('Admin/ContactMessages/Delete/{id}', [AdminContactMessageController::class, 'destroy']);
 });
 
 Route::middleware(['isDoctor'])->group(function () {
