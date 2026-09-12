@@ -34,4 +34,15 @@ class DoctorAssignment extends Model
             'doctor_assignment_id'
         );
     }
+
+    public function schedules()
+    {
+        return $this->hasMany(DoctorSchedule::class, 'doctor_assignment_id');
+    }
+
+    public function scheduleExceptions()
+    {
+        return $this->hasMany(DoctorScheduleException::class, 'doctor_assignment_id');
+    }
+    
 }

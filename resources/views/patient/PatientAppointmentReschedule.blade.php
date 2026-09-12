@@ -203,6 +203,14 @@
                         value=""
                     >
 
+                    <div class="mb-4">
+                        <label for="reschedule_reason" class="fw-semibold mb-2">
+                            Reason (optional)
+                        </label>
+                        <textarea name="reschedule_reason" id="reschedule_reason"
+                            class="form-control" maxlength="500" rows="3">{{ old('reschedule_reason') }}</textarea>
+                    </div>
+
 
                     <div class="d-flex gap-3">
 

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Auth;
+use App\Models\Doctor;
 
 class DoctorMiddleware
 {
@@ -16,11 +17,18 @@ class DoctorMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(Auth::user() && Auth::user()->user_type == "Doctor"){
+        $user = Auth::user();
+        $doctor = $user ? Doctor::where('user_id', $user->id)->first() : null;
+        if ($user && $user->user_type === 'Doctor' && $user->account_status === 'Active'
+            && (!$doctor || $doctor->status === 'Active')) {
             return $next($request);
         } else {
+            if ($user && $user->account_status !== 'Active') {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
             Auth::logout();
-            return redirect('login')->with('msg', 'Doctor login required');
+            return redirect('login')->with('msg', 'Doctor login required or account/profile is inactive');
         }
     }
 }

@@ -24,6 +24,12 @@ class AppointmentBookedNotification extends Notification
 
     public function toDatabase(object $notifiable): array
     {
+        $subject = $notifiable->user_type === 'Doctor'
+            ? 'A new appointment request was submitted.'
+            : ($notifiable->user_type === 'Admin'
+                ? 'A new appointment was booked.'
+                : 'Your appointment request was submitted successfully.');
+
         return [
             'appointment_id' =>
                 $this->appointment->id,
@@ -37,10 +43,13 @@ class AppointmentBookedNotification extends Notification
             'title' =>
                 'Appointment request submitted',
 
-            'message' =>
-                'Your appointment '
-                . $this->appointment->appointment_number
-                . ' was submitted successfully.',
+            'message' => $subject . ' Appointment '
+                . $this->appointment->appointment_number . ' on '
+                . $this->appointment->appointment_date->format('Y-m-d') . ' '
+                . substr((string) $this->appointment->start_time, 0, 5) . '.',
+            'appointment_date' => $this->appointment->appointment_date->format('Y-m-d'),
+            'start_time' => (string) $this->appointment->start_time,
+            'end_time' => (string) $this->appointment->end_time,
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointments;
+use App\Models\User;
 use App\Models\AppointmentHistory;
 use App\Models\DoctorAppointmentSlot;
 use App\Notifications\AppointmentBookedNotification;
@@ -146,8 +147,14 @@ class AppointmentBookingController extends Controller
                 $assignment->status !== 'Active' ||
                 !$assignment->doctor ||
                 $assignment->doctor->status !== 'Active' ||
+                !$assignment->doctor->user ||
+                $assignment->doctor->user->account_status !== 'Active' ||
                 !$assignment->facilitySpecialization ||
-                $assignment->facilitySpecialization->status !== 'Active'
+                $assignment->facilitySpecialization->status !== 'Active' ||
+                !$assignment->facilitySpecialization->facility ||
+                $assignment->facilitySpecialization->facility->status !== 'Active' ||
+                !$assignment->facilitySpecialization->facility->city ||
+                $assignment->facilitySpecialization->facility->city->status !== 'Active'
             ) {
 
                 throw ValidationException::withMessages([
@@ -260,11 +267,18 @@ class AppointmentBookingController extends Controller
             return $appointment;
         });
 
-        $user->notify(
-            new AppointmentBookedNotification(
-                $appointment
-            )
-        );
+        $appointment->load('doctorAssignment.doctor.user');
+        $notification = new AppointmentBookedNotification($appointment);
+        $user->notify($notification);
+        $doctorUser = $appointment->doctorAssignment?->doctor?->user;
+        if ($doctorUser && $doctorUser->id !== $user->id) {
+            $doctorUser->notify(new AppointmentBookedNotification($appointment));
+        }
+        User::where('user_type', 'Admin')
+            ->where('account_status', 'Active')
+            ->where('id', '<>', $user->id)
+            ->get()
+            ->each(fn ($admin) => $admin->notify(new AppointmentBookedNotification($appointment)));
 
 
         return redirect(

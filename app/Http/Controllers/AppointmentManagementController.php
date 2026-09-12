@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointments;
+use App\Models\User;
 use App\Models\AppointmentHistory;
 use App\Models\DoctorAppointmentSlot;
 use App\Notifications\AppointmentRescheduledNotification;
@@ -64,6 +65,10 @@ class AppointmentManagementController extends Controller
                     'Past appointments cannot be rescheduled.'
                 );
         }
+        if (now()->diffInMinutes($appointmentStart) < 120) {
+            return redirect()->route('patient.appointments.show', $appointment->id)
+                ->with('error', 'Appointments cannot be changed within two hours of the start time.');
+        }
 
 
         return view(
@@ -82,6 +87,7 @@ class AppointmentManagementController extends Controller
                 'integer',
                 'exists:doctor_appointment_slots,id',
             ],
+            'reschedule_reason' => ['nullable', 'string', 'max:500'],
         ]);
 
 
@@ -167,6 +173,11 @@ class AppointmentManagementController extends Controller
                         'The selected appointment time has already passed.',
                 ]);
             }
+            if (now()->diffInMinutes($newSlotStart) < 120) {
+                throw ValidationException::withMessages([
+                    'slot_id' => 'Appointments cannot be changed within two hours of the start time.',
+                ]);
+            }
 
 
             /*
@@ -236,6 +247,8 @@ class AppointmentManagementController extends Controller
 
             $appointment->confirmed_at =
                 null;
+            $appointment->reschedule_reason =
+                $validated['reschedule_reason'] ?? null;
 
             $appointment->save();
 
@@ -272,16 +285,29 @@ class AppointmentManagementController extends Controller
                     $newSlot->id,
 
                 'note' =>
-                    'Appointment rescheduled by patient.',
+                    Str::limit(
+                        'Appointment rescheduled by patient.'
+                        . (!empty($validated['reschedule_reason'])
+                            ? ' Reason: ' . $validated['reschedule_reason']
+                            : ''),
+                        500
+                    ),
             ]);
             return $appointment;
         });
 
-        Auth::user()->notify(
-            new AppointmentRescheduledNotification(
-                $appointment
-            )
-        );
+        $appointment->load('doctorAssignment.doctor.user');
+        $notification = new AppointmentRescheduledNotification($appointment);
+        Auth::user()->notify($notification);
+        $doctorUser = $appointment->doctorAssignment?->doctor?->user;
+        if ($doctorUser && $doctorUser->id !== Auth::id()) {
+            $doctorUser->notify(new AppointmentRescheduledNotification($appointment));
+        }
+        User::where('user_type', 'Admin')
+            ->where('account_status', 'Active')
+            ->where('id', '<>', Auth::id())
+            ->get()
+            ->each(fn ($admin) => $admin->notify(new AppointmentRescheduledNotification($appointment)));
 
 
         return redirect()
@@ -344,6 +370,10 @@ class AppointmentManagementController extends Controller
                     'Past appointments cannot be cancelled.'
                 );
         }
+        if (now()->diffInMinutes($appointmentStart) < 120) {
+            return redirect()->route('patient.appointments.show', $appointment->id)
+                ->with('error', 'Appointments cannot be changed within two hours of the start time.');
+        }
 
 
         return view(
@@ -403,6 +433,11 @@ class AppointmentManagementController extends Controller
                 throw ValidationException::withMessages([
                     'cancellation_reason' =>
                         'Past appointments cannot be cancelled.',
+                ]);
+            }
+            if (now()->diffInMinutes($appointmentStart) < 120) {
+                throw ValidationException::withMessages([
+                    'cancellation_reason' => 'Appointments cannot be changed within two hours of the start time.',
                 ]);
             }
 
@@ -501,11 +536,18 @@ class AppointmentManagementController extends Controller
             ]);
             return $appointment;
         });
-        Auth::user()->notify(
-            new AppointmentCancelledNotification(
-                $appointment
-            )
-        );
+        $appointment->load('doctorAssignment.doctor.user');
+        $notification = new AppointmentCancelledNotification($appointment);
+        Auth::user()->notify($notification);
+        $doctorUser = $appointment->doctorAssignment?->doctor?->user;
+        if ($doctorUser && $doctorUser->id !== Auth::id()) {
+            $doctorUser->notify(new AppointmentCancelledNotification($appointment));
+        }
+        User::where('user_type', 'Admin')
+            ->where('account_status', 'Active')
+            ->where('id', '<>', Auth::id())
+            ->get()
+            ->each(fn ($admin) => $admin->notify(new AppointmentCancelledNotification($appointment)));
 
 
         return redirect()

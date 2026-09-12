@@ -24,6 +24,12 @@ class AppointmentCancelledNotification extends Notification
 
     public function toDatabase(object $notifiable): array
     {
+        $subject = $notifiable->user_type === 'Doctor'
+            ? 'A patient cancelled an appointment.'
+            : ($notifiable->user_type === 'Admin'
+                ? 'An appointment was cancelled.'
+                : 'Your appointment has been cancelled.');
+
         return [
             'appointment_id' =>
                 $this->appointment->id,
@@ -37,10 +43,13 @@ class AppointmentCancelledNotification extends Notification
             'title' =>
                 'Appointment cancelled',
 
-            'message' =>
-                'Your appointment '
-                . $this->appointment->appointment_number
-                . ' has been cancelled.',
+            'message' => $subject . ' Appointment '
+                . $this->appointment->appointment_number . ' on '
+                . $this->appointment->appointment_date->format('Y-m-d') . '.',
+            'appointment_date' => $this->appointment->appointment_date->format('Y-m-d'),
+            'start_time' => (string) $this->appointment->start_time,
+            'end_time' => (string) $this->appointment->end_time,
+            'reason' => $this->appointment->cancellation_reason,
         ];
     }
 }

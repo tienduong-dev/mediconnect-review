@@ -24,6 +24,12 @@ class AppointmentRescheduledNotification extends Notification
 
     public function toDatabase(object $notifiable): array
     {
+        $subject = $notifiable->user_type === 'Doctor'
+            ? 'A patient rescheduled an appointment.'
+            : ($notifiable->user_type === 'Admin'
+                ? 'An appointment was rescheduled.'
+                : 'Your appointment was rescheduled successfully.');
+
         return [
             'appointment_id' =>
                 $this->appointment->id,
@@ -37,10 +43,14 @@ class AppointmentRescheduledNotification extends Notification
             'title' =>
                 'Appointment rescheduled',
 
-            'message' =>
-                'Your appointment '
-                . $this->appointment->appointment_number
-                . ' has been rescheduled successfully.',
+            'message' => $subject . ' Appointment '
+                . $this->appointment->appointment_number . ' is now on '
+                . $this->appointment->appointment_date->format('Y-m-d') . ' '
+                . substr((string) $this->appointment->start_time, 0, 5) . '.',
+            'appointment_date' => $this->appointment->appointment_date->format('Y-m-d'),
+            'start_time' => (string) $this->appointment->start_time,
+            'end_time' => (string) $this->appointment->end_time,
+            'reason' => $this->appointment->reschedule_reason,
         ];
     }
 }
