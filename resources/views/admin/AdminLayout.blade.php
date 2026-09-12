@@ -946,6 +946,9 @@
             class="{{ $on('Admin/DoctorAssignments', 'Admin/DoctorAssignments/*') }}">
             <i class="bi bi-person-vcard"></i><span>Doctor assignments</span>
         </a>
+        <a href="{{ url('Admin/Availability') }}" class="{{ $on('Admin/Availability') }}">
+            <i class="bi bi-calendar3-week"></i><span>Availability</span>
+        </a>
 
         <div class="sb-group">Content</div>
         <a href="{{ url('Admin/MedicalContents') }}" class="{{ $on('Admin/MedicalContents', 'Admin/MedicalContents/*') }}">

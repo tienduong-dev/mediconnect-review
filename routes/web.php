@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\MedicalContentController as AdminMedicalContentCo
 use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 use App\Http\Controllers\Admin\AccountController as AdminAccountController;
 use App\Http\Controllers\Admin\SearchController as AdminSearchController;
+use App\Http\Controllers\Admin\SlotController as AdminSlotController;
 
 
 // ================ Patient Register Router's ================
@@ -171,6 +172,9 @@ Route::middleware(['isAdmin'])->group(function () {
 
     // One search box for the whole panel (read only)
     Route::get('Admin/Search', [AdminSearchController::class, 'index']);
+
+    // Doctor availability, read only (slots belong to the Doctor module)
+    Route::get('Admin/Availability', [AdminSlotController::class, 'index']);
 });
 
 Route::middleware(['isDoctor'])->group(function () {

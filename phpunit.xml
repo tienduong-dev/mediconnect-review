@@ -23,8 +23,21 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+
+        <!--
+            The schema lives in the team's .sql file, not in migrations, so
+            there is nothing for an in-memory sqlite database to build from.
+            Tests run against a MySQL copy of that schema instead, and every
+            test is wrapped in a transaction that is rolled back, so nothing
+            they write survives.
+
+            Create it once:
+              mysql -u root -e "CREATE DATABASE appointment_db_test"
+              mysql -u root appointment_db_test < mediconnect_complete_final.sql
+        -->
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_DATABASE" value="appointment_db_test"/>
+
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
