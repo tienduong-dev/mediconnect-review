@@ -34,9 +34,12 @@ abstract class AdminTestCase extends TestCase
     {
         parent::setUp();
 
+        // Columns follow the team's .sql exactly: cities has state/country
+        // and no slug, facilities require a unique code and a phone.
         $this->cityId = DB::table('cities')->insertGetId([
             'name' => 'Test City ' . $this->rand(),
-            'slug' => 'test-city-' . $this->rand(),
+            'state' => 'Test State',
+            'country' => 'Vietnam',
             'status' => 'Active',
             'created_at' => now(),
             'updated_at' => now(),
@@ -45,8 +48,9 @@ abstract class AdminTestCase extends TestCase
         $this->facilityId = DB::table('facilities')->insertGetId([
             'city_id' => $this->cityId,
             'name' => 'Test Clinic ' . $this->rand(),
-            'slug' => 'test-clinic-' . $this->rand(),
+            'code' => 'TC' . substr($this->rand(), 0, 8),
             'address' => '1 Test Street',
+            'phone' => '0912345678',
             'status' => 'Active',
             'created_at' => now(),
             'updated_at' => now(),

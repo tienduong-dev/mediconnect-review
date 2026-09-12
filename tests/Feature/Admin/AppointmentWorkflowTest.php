@@ -149,14 +149,19 @@ class AppointmentWorkflowTest extends AdminTestCase
         $takenSlot   = $this->makeSlot($assignment, 'Booked', null, '11:00:00');
         $appointment = $this->makeAppointment($assignment, $oldSlot, 'Confirmed');
 
+        // The refusal is a flash message, not a validation error: the input
+        // was well formed, the state of the world changed underneath it.
         $this->actingAs($this->admin())
             ->post('Admin/Appointments/Adjust/' . $appointment, ['slot_id' => $takenSlot])
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
 
         // Nothing moved: the original booking is intact
         $row = DB::table('appointments')->find($appointment);
         $this->assertSame($oldSlot, (int) $row->slot_id);
         $this->assertSame('Booked', $this->slotStatus($oldSlot));
+
+        // And the slot somebody else holds is untouched
+        $this->assertSame('Booked', $this->slotStatus($takenSlot));
     }
 
     public function test_the_appointment_list_ignores_a_sort_column_that_is_not_whitelisted(): void
