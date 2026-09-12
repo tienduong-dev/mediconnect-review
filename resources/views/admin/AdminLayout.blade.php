@@ -338,7 +338,17 @@
             :root:not([data-theme="light"]) .theme-btn .bi-sun { display: inline; }
         }
 
-        .tb-user { display: flex; align-items: center; gap: 10px; }
+        .tb-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 6px 4px 10px;
+            border-radius: 22px;
+            color: inherit;
+            transition: background-color .15s var(--ease);
+        }
+
+        .tb-user:hover { background: var(--surface-2); color: inherit; }
         .tb-user .nm { font-size: 13px; font-weight: 600; color: var(--ink); }
         .tb-user .rl { font-size: 11.5px; color: var(--muted); }
 
@@ -904,13 +914,13 @@
                 <i class="bi bi-sun"></i>
             </button>
 
-            <div class="tb-user">
+            <a href="{{ url('Admin/MyAccount') }}" class="tb-user" title="My account">
                 <div class="who text-end">
                     <div class="nm">{{ $me->name ?? 'Administrator' }}</div>
                     <div class="rl">Administrator</div>
                 </div>
                 <span class="av">{{ strtoupper(mb_substr($me->name ?? 'A', 0, 1)) }}</span>
-            </div>
+            </a>
         </div>
     </header>
 

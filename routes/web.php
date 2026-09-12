@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\FacilitySpecializationController;
 use App\Http\Controllers\Admin\DoctorAssignmentController;
 use App\Http\Controllers\Admin\MedicalContentController as AdminMedicalContentController;
 use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
+use App\Http\Controllers\Admin\AccountController as AdminAccountController;
 
 
 // ================ Patient Register Router's ================
@@ -160,6 +161,12 @@ Route::middleware(['isAdmin'])->group(function () {
     Route::post('Admin/ContactMessages/Reopen/{id}', [AdminContactMessageController::class, 'reopen']);
     Route::post('Admin/ContactMessages/Notes/{id}', [AdminContactMessageController::class, 'saveNotes']);
     Route::post('Admin/ContactMessages/Delete/{id}', [AdminContactMessageController::class, 'destroy']);
+
+    // The signed-in admin's own account (the id always comes from the session)
+    Route::get('Admin/MyAccount', [AdminAccountController::class, 'show']);
+    Route::get('Admin/MyAccount/Admins', [AdminAccountController::class, 'admins']);
+    Route::post('Admin/MyAccount/Profile', [AdminAccountController::class, 'updateProfile']);
+    Route::post('Admin/MyAccount/Password', [AdminAccountController::class, 'updatePassword']);
 });
 
 Route::middleware(['isDoctor'])->group(function () {
