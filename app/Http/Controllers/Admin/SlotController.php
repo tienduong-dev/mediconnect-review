@@ -100,32 +100,72 @@ class SlotController extends Controller
     }
 
     /**
-     * Which active assignments have no open slot from today onwards.
+     * Why each active assignment is unbookable, not just that it is.
      *
-     * This is the list that explains a failed patient search, so it is
-     * shown whichever doctor is currently selected.
+     * Three causes look identical on a booking form but need different
+     * action, so they are counted separately:
+     *
+     *   never     - no slot row has ever existed; the doctor has not opened
+     *               a schedule at all
+     *   expired   - slots exist but every one of them is in the past, which
+     *               is what a stale seed or an abandoned schedule looks like
+     *   taken     - future slots exist but none is still Available
      */
     private function coverage(): array
     {
-        $withOpenSlots = DB::table('doctor_appointment_slots')
-            ->where('status', 'Available')
-            ->whereDate('slot_date', '>=', now()->toDateString())
-            ->distinct()
-            ->pluck('doctor_assignment_id')
-            ->all();
+        $today = now()->toDateString();
 
-        $starved = DoctorAssignment::with([
+        $stats = DB::table('doctor_appointment_slots')
+            ->select('doctor_assignment_id')
+            ->selectRaw('MAX(slot_date) as last_date')
+            ->selectRaw('SUM(CASE WHEN slot_date >= ? THEN 1 ELSE 0 END) as future_total', [$today])
+            ->selectRaw('SUM(CASE WHEN slot_date >= ? AND status = ? THEN 1 ELSE 0 END) as future_open', [$today, 'Available'])
+            ->groupBy('doctor_assignment_id')
+            ->get()
+            ->keyBy('doctor_assignment_id');
+
+        $active = DoctorAssignment::with([
                 'doctor.user:id,name',
                 'facilitySpecialization.facility:id,name',
                 'facilitySpecialization.specialization:id,name',
             ])
             ->where('status', 'Active')
-            ->when($withOpenSlots, fn ($q) => $q->whereNotIn('id', $withOpenSlots))
             ->get();
+
+        $starved = [];
+        $covered = 0;
+        $reasons = ['never' => 0, 'expired' => 0, 'taken' => 0];
+
+        foreach ($active as $assignment) {
+            $row = $stats[$assignment->id] ?? null;
+
+            if ($row && (int) $row->future_open > 0) {
+                $covered++;
+                continue;
+            }
+
+            if (!$row) {
+                $reason = 'never';
+            } elseif ((int) $row->future_total === 0) {
+                $reason = 'expired';
+            } else {
+                $reason = 'taken';
+            }
+
+            $reasons[$reason]++;
+
+            $starved[] = [
+                'assignment' => $assignment,
+                'reason'     => $reason,
+                'last_date'  => $row->last_date ?? null,
+            ];
+        }
 
         return [
             'starved' => $starved,
-            'covered' => count($withOpenSlots),
+            'covered' => $covered,
+            'total'   => $active->count(),
+            'reasons' => $reasons,
         ];
     }
 

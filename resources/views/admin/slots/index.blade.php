@@ -21,39 +21,81 @@
             <em>why</em> a patient can or cannot book, it does not change availability.
         </div>
 
-        {{-- ============ Doctors with nothing open ============ --}}
-        @if ($coverage['starved']->isNotEmpty())
-            <div class="card mb-3" style="border-color: color-mix(in srgb, var(--danger) 30%, transparent);">
+        {{-- ============ Why patients cannot book ============ --}}
+        @if (count($coverage['starved']) > 0)
+            @php
+                $why = [
+                    'never'   => ['danger', 'bi-calendar-x',     'Never opened',   'The doctor has not created a weekly schedule, so no slot was ever generated.'],
+                    'expired' => ['warn',   'bi-hourglass-bottom','All in the past','Slots exist but every one of them has already passed. The schedule needs extending.'],
+                    'taken'   => ['info',   'bi-people-fill',    'Fully booked',   'Future slots exist but every one is held, booked or blocked.'],
+                ];
+            @endphp
+
+            <div class="card mb-3">
                 <div class="card-header d-flex align-items-center gap-2">
                     <span class="chip chip-danger" style="width:28px;height:28px;font-size:14px;">
                         <i class="bi bi-exclamation-triangle"></i>
                     </span>
-                    <h5>{{ $coverage['starved']->count() }} active assignment(s) have no open slot</h5>
+                    <h5>
+                        {{ count($coverage['starved']) }} of {{ $coverage['total'] }} active assignments
+                        cannot be booked
+                    </h5>
+                    <span class="stat-sub ms-auto">{{ $coverage['covered'] }} bookable</span>
                 </div>
+
                 <div class="card-body">
-                    <p class="stat-sub mb-3">
-                        Patients searching for these doctors get an empty result, and an admin cannot move an
-                        appointment onto them either. The doctor has to open slots.
-                    </p>
-                    <div class="row g-2">
-                        @foreach ($coverage['starved'] as $row)
-                            <div class="col-md-6">
-                                <a href="{{ url('Admin/Availability') }}?assignment_id={{ $row->id }}" class="starved">
-                                    <span class="chip chip-danger"><i class="bi bi-calendar-x"></i></span>
-                                    <div class="min-w-0">
-                                        <div class="cell-title text-truncate">
-                                            {{ $row->doctor->user->name ?? 'Unknown doctor' }}
-                                        </div>
-                                        <div class="stat-sub text-truncate">
-                                            {{ $row->facilitySpecialization->facility->name ?? '?' }}
-                                            &middot;
-                                            {{ $row->facilitySpecialization->specialization->name ?? '?' }}
-                                        </div>
+                    {{-- The cause matters more than the list: each one needs a
+                         different fix, and they look identical to a patient. --}}
+                    <div class="row g-2 mb-3">
+                        {{-- Distinct names on purpose: $tone holds the slot
+                             status map that the day grid below still needs. --}}
+                        @foreach ($why as $key => [$causeTone, $causeIcon, $causeLabel, $causeHint])
+                            @continue($coverage['reasons'][$key] === 0)
+                            <div class="col-md-4">
+                                <div class="cause cause-{{ $causeTone }}">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="chip chip-{{ $causeTone }}"
+                                            style="width:26px;height:26px;font-size:12px;">
+                                            <i class="bi {{ $causeIcon }}"></i>
+                                        </span>
+                                        <span class="cell-title">
+                                            {{ $coverage['reasons'][$key] }} &middot; {{ $causeLabel }}
+                                        </span>
                                     </div>
-                                </a>
+                                    <div class="stat-sub">{{ $causeHint }}</div>
+                                </div>
                             </div>
                         @endforeach
                     </div>
+
+                    <details class="starved-list">
+                        <summary>Show the {{ count($coverage['starved']) }} affected assignments</summary>
+                        <div class="row g-2 mt-2">
+                            @foreach ($coverage['starved'] as $row)
+                                @php($fs = $row['assignment']->facilitySpecialization)
+                                <div class="col-md-6">
+                                    <a href="{{ url('Admin/Availability') }}?assignment_id={{ $row['assignment']->id }}"
+                                        class="starved">
+                                        <span class="chip chip-{{ $why[$row['reason']][0] }}">
+                                            <i class="bi {{ $why[$row['reason']][1] }}"></i>
+                                        </span>
+                                        <div class="min-w-0">
+                                            <div class="cell-title text-truncate">
+                                                {{ $row['assignment']->doctor->user->name ?? 'Unknown doctor' }}
+                                            </div>
+                                            <div class="stat-sub text-truncate">
+                                                {{ $fs->facility->name ?? '?' }} &middot; {{ $fs->specialization->name ?? '?' }}
+                                                @if ($row['last_date'])
+                                                    &middot; last slot
+                                                    {{ \Illuminate\Support\Carbon::parse($row['last_date'])->format('d/m/Y') }}
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    </details>
                 </div>
             </div>
         @endif
@@ -230,6 +272,30 @@
                 border-color: color-mix(in srgb, var(--danger) 45%, transparent);
                 transform: translateY(-1px);
             }
+
+            .admin-page .cause {
+                padding: 11px 13px;
+                border: 1px solid var(--line);
+                border-radius: var(--r);
+                background: var(--surface-2);
+                height: 100%;
+            }
+
+            .admin-page .cause-danger { border-color: color-mix(in srgb, var(--danger) 32%, transparent); }
+            .admin-page .cause-warn   { border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+            .admin-page .cause-info   { border-color: color-mix(in srgb, var(--info) 32%, transparent); }
+
+            .admin-page .starved-list summary {
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--brand);
+                list-style: none;
+            }
+
+            .admin-page .starved-list summary::-webkit-details-marker { display: none; }
+            .admin-page .starved-list summary::before { content: "\25B8"; margin-right: 6px; display: inline-block; transition: transform .15s var(--ease); }
+            .admin-page .starved-list[open] summary::before { transform: rotate(90deg); }
 
             .admin-page .legend-item { display: flex; align-items: center; gap: 7px; }
             .admin-page .legend-item .lb { font-size: 12.5px; color: var(--muted); }
